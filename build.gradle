@@ -52,6 +52,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation:3.3.2'
 	// modelmapper
 	implementation 'org.modelmapper:modelmapper:3.2.1'
+	// thymeleaf-layout-dialect": 타입리프 레이아웃 템플릿
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
 
 	// spring-boot-devtools
 	//implementation 'org.springframework.boot:spring-boot-devtools:3.3.2'
