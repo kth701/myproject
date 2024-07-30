@@ -1,0 +1,96 @@
+
+
+//1. QueryDsl
+buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
+
+plugins {
+	id 'java'
+	id 'war'
+	id 'org.springframework.boot' version '3.3.2'
+	id 'io.spring.dependency-management' version '1.1.6'
+
+}
+
+group = 'com.spring'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+	annotationProcessor 'org.projectlombok:lombok'
+	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+
+
+
+	// springboot 3.xx 이후 : springfox-swagger-ui: REST API테스트 라이브러리
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+	// spring-boot-starter-validation: 서버 유효성 검사 라이브러리
+	implementation 'org.springframework.boot:spring-boot-starter-validation:3.3.2'
+	// modelmapper
+	implementation 'org.modelmapper:modelmapper:3.2.1'
+
+	// spring-boot-devtools
+	//implementation 'org.springframework.boot:spring-boot-devtools:3.3.2'
+
+
+
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	// IntelliJ gradel 적용시 필수(eclipse인 생략)
+	testAnnotationProcessor 'org.projectlombok:lombok'
+	testImplementation  'org.projectlombok:lombok'
+
+
+
+
+	// 2. QueryDsl 관련 라이브러리
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
+	annotationProcessor(
+
+			"jakarta.persistence:jakarta.persistence-api",
+			"jakarta.annotation:jakarta.annotation-api",
+			"com.querydsl:querydsl-apt:${queryDslVersion}:jakarta")
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+// 3. QueryDsl
+sourceSets {
+	main {
+		java {
+			srcDirs = ["$projectDir/src/main/java", "$projectDir/build/generated"]
+		}
+	}
+}
+compileJava.dependsOn('clean')
+
+// 5. jpa queryDsl error => "Attempt to recreate a file" 도메인 중복 발생
+// IntelliJ 셋팅에서  Gradle: IntelliJ -> Gradle로 변환   or
+// IntelliJ 셋탱에서  Gradle: Gradle -> IntelliJ로
