@@ -75,7 +75,9 @@ class BoardServiceTest {
         .size(10)
         .build();
 
+    // 조건 검색 및 페이징 서비스
     PageResponseDTO<BoardDTO> responseDTO = boardService.list(pageRequestDTO);
+
     log.info("\n=> "+responseDTO);
   }
 
