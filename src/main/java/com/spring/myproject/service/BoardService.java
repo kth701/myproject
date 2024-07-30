@@ -2,6 +2,8 @@ package com.spring.myproject.service;
 
 
 import com.spring.myproject.dto.BoardDTO;
+import com.spring.myproject.dto.PageRequestDTO;
+import com.spring.myproject.dto.PageResponseDTO;
 import com.spring.myproject.entity.Board;
 
 public interface BoardService {
@@ -14,6 +16,7 @@ public interface BoardService {
   Board modify(BoardDTO boardDTO);
   // 게시글 삭제
   void remove(Long bno);
-
+  // 게시글 목록: 페이징 처리를 한 게시글 목록
+  PageResponseDTO<BoardDTO> list (PageRequestDTO pageRequestDTO);
 
 }

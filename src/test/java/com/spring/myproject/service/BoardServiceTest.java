@@ -1,6 +1,8 @@
 package com.spring.myproject.service;
 
 import com.spring.myproject.dto.BoardDTO;
+import com.spring.myproject.dto.PageRequestDTO;
+import com.spring.myproject.dto.PageResponseDTO;
 import com.spring.myproject.entity.Board;
 import lombok.extern.log4j.Log4j2;
 
@@ -60,6 +62,21 @@ class BoardServiceTest {
   public void testBoardDeleteTest(){
     long bno = 102L;
     boardService.remove(bno);
+  }
+
+  // 페이징 처리 List
+  @Test@DisplayName("게시글 페이징 목록 서비스 테스트")
+  public void testBoardListTest(){
+    // 더미 페이징 설정
+    PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
+        .type("tcw")
+        .keyword("1")
+        .page(1)
+        .size(10)
+        .build();
+
+    PageResponseDTO<BoardDTO> responseDTO = boardService.list(pageRequestDTO);
+    log.info("\n=> "+responseDTO);
   }
 
 }
