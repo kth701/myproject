@@ -26,6 +26,10 @@ public class Board extends BaseEntity {
     this.title = title;
     this.content = content;
   }
+
+
+  // 첨부파일
+
 }
 
 /*

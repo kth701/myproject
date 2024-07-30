@@ -7,15 +7,15 @@ import lombok.*;
 @Getter
 @Builder
 @AllArgsConstructor@NoArgsConstructor
-@ToString(exclude = "board") // Board Entity에 존재햐는 toString()는 작동 중지
+//@ToString(exclude = "board") // Board Entity에 존재햐는 toString()는 작동 중지
 public class Reply extends BaseEntity{
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long rno;
 
-  @ManyToOne(fetch = FetchType.LAZY)  // board entity연결은 즉시 연결이 아닌 필요시에만 연결
-  private Board board;
+  //@ManyToOne(fetch = FetchType.LAZY)  // board entity연결은 즉시 연결이 아닌 필요시에만 연결
+  //private Board board;
 
   private String replyText;
   private String replyer;
