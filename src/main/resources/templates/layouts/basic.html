@@ -9,6 +9,8 @@
   <title>Simple Sidebar - Start Bootstrap Template</title>
 
   <!-- 전체페이지에서 공통을 사용되는 css인경우 :  Core theme CSS (includes Bootstrap) -->
+  <!--  <link href="css/styles.css"-->
+  <!--        th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />-->
   <link href="css/styles.css"
         th:href="@{/css/styles.css}" rel="stylesheet" />
 
@@ -19,8 +21,8 @@
 
 <body>
 <div class="d-flex" id="wrapper">
-  <!-- Sidebar-->
-  <div th:replace="~{fragments/header::sidebar}"></div>
+  <!-- Sidebar -->
+  <!-- <div th:replace="~{fragments/header::sidebar}"></div> -->
   <div class="border-end bg-white" id="sidebar-wrapper">
     <div class="sidebar-heading border-bottom bg-light">Start Bootstrap</div>
     <div class="list-group list-group-flush">
@@ -33,11 +35,12 @@
     </div>
   </div>
 
+
   <!-- Page content wrapper-->
   <div id="page-content-wrapper">
 
     <!-- Top navigation-->
-    <div th:replace="~{fragments/header::navbar}"></div>
+    <!-- <div th:replace="~{fragments/header::navbar}"></div> -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
       <div class="container-fluid">
         <button class="btn btn-primary" id="sidebarToggle">Toggle Menu</button>
@@ -60,6 +63,7 @@
       </div>
     </nav>
 
+
     <!-- Page content: 바뀌는 콘텐츠 영역을 불러오기 -->
     <div class="container-fluid" layout:fragment="content" >
 
@@ -72,11 +76,14 @@
 
 <!-- 페이지 전체 공통으로 사용되는 javascript -->
 <!-- Bootstrap core JS-->
-<script src="js/bootstrap.bundle.min.js"
-        th:src="@{/js/bootstrap.bundle.min.js}"></script>
 <!-- Core theme JS-->
+<!--<script src="js/bootstrap.bundle.min.js"-->
+<!--        th:src="@{/js/bootstrap.bundle.min.js}"></script>-->
 <script src="js/scripts.js"
         th:src="@{/js/scripts.js}"></script>
+
+
+
 
 <!-- javascript import : 특정 페이지에서 사용되는 javascript인경우 -->
 <th:block layout:fragment="myscript"></th:block>

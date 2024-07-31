@@ -5,13 +5,108 @@
 
 
 <!-- 현재 페이지에서만 사용하는 컨텐츠(내용) 정의 -->
-<div layout:fragment="content">
-
-<!--  <div th:text="${responseDTO}"></div>-->
+<div layout:fragment="content" class="p-3">
+<!--  <div th:text="${responseDTO.dtoList}"></div>-->
+  <div th:text="${pageRequestDTO.getLink()}"></div>
   <hr>
-  <div th:text="${responseDTO.dtoList}"></div>
+  <!-- 검색 키워드 -->
+  <div class="row mt-3 ">
+      <form action="/board/list"
+            method="get" id="searchForm">
 
+        <div class="col">
+          <input type="hidden" name="size" th:value="${pageRequestDTO.size}">
 
+          <!-- 타입, 키워드, 전송 12 column system -->
+          <div class="input-group row gx-4">
+            <!-- 타입 -->
+            <div class="input-group-prepend col">
+              <select class="form-select" name="type">
+                <option value="">---</option>
+                <option value="t"   th:selected="${pageRequestDTO.type == 't'}" >제목</option>
+                <option value="c"   th:selected="${pageRequestDTO.type == 'c'}" >내용</option>
+                <option value="w"   th:selected="${pageRequestDTO.type == 'w'}" >작성자</option>
+                <option value="tc"  th:selected="${pageRequestDTO.type == 'tc'}">제목+내용</option>
+                <option value="tcw" th:selected="${pageRequestDTO.type == 'tcw'}">제목+내용+작성자</option>
+              </select>
+            </div>
+            <!-- 검색 키워드 -->
+            <div class="col">
+              <input type="search" class="form-control" name="keyword" th:value="${pageRequestDTO.keyword}"/>
+            </div>
+            <!-- 전송 -->
+            <div class="input-group-append col">
+              <button type="search" class="btn btn-outline-secondary searchBtn">Search</button>
+              <button type="button"  class="btn btn-outline-secondary clearBtn">Clear</button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </form>
+  </div>
+
+  <div class="row mt-3">
+    <div class="card">
+      <div class="card-header">
+        Board List
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">Board List</h5>
+
+        <!-- 게시글 List -->
+        <table class="table">
+          <thead>
+          <tr>
+            <th scope="col">Bno</th>
+            <th scope="col">Title</th>
+            <th scope="col">Writer</th>
+            <th scope="col">RegDate</th>
+          </tr>
+          </thead>
+
+          <!-- scope 범위의 타임리프 변수 역할: link는 값을 보관하는 역할 -->
+          <tbody th:with="link=${pageRequestDTO.getLink()}">
+          <tr th:each="dto: ${responseDTO.dtoList}">
+            <td>[[${dto.bno}]]</td>
+
+            <td >
+              <!-- "board/read?bno=101"+"&"+"page=1&size=10" -->
+              <a href="#" th:href="|@{/board/read(bno=${dto.bno})}&${link}|"
+                 class="text-decoration-none">[[${dto.title}]]</a>
+            </td>
+            <td>[[${dto.writer}]]</td>
+            <td>[[${   #temporals.format(dto.regDate, "yyyy-MM-dd")  }]]</td>
+          </tr>
+
+          </tbody>
+        </table>
+
+        <!-- 페이징 번호 -->
+        <div class="float-end">
+          <nav aria-label="...">
+            <ul class="pagination">
+              <li class="page-item " th:if="${responseDTO.prev}">
+                <a class="page-link" th:data-num="${responseDTO.star-1}">이전</a>
+              </li>
+
+              <th:block th:each="i : ${#numbers.sequence(responseDTO.start,responseDTO.end)}">
+              <li th:classappend="${responseDTO.page == i}? 'active': ''  "
+                  class="page-item">
+                <a class="page-link" th:data-num="${i}">[[${i}]]</a></li>
+              </th:block>
+
+              <li class="page-item" th:if="${responseDTO.next}">
+                <a class="page-link"  th:data-num="${responseDTO.end+1}">다음</a>
+              </li>
+
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
@@ -21,7 +116,23 @@
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
 <script layout:fragment="myscript" th:inline="javascript">
+  document.querySelector('.pagination').addEventListener('click', function(e) {
+    e.preventDefault(); // 기본 이벤트 제거
+    e.stopPropagation();// 현재 이벤트가 발생한 요소의 상위요소들에 대해서는 이벤트 감지 제거
 
+    const target = e.target;
+    if (target.tagName != 'A') return; // <a>태그가 아니면 종료
+
+    const num = target.getAttribute('data-num');
+
+    // 검색 기능 폼(form)에서 전송
+    const formObj = document.querySelector('#searchForm');//const formObj = document.querySelector('form');
+    formObj.innerHTML += `<input type='hidden' name='page' value='${num}'>`
+    formObj.submit();
+
+    //location.href="/board/list/page="+num; // 클릭한 페이지번호
+
+  })
 </script>
 
 </html>
