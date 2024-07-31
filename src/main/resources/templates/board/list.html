@@ -12,7 +12,7 @@
 
   <hr>
   <!-- 검색 키워드 -->
-  <div class="row mt-3 ">
+  <div class="mt-3 ">
       <form action="/board/list"
             method="get" id="searchForm">
 
@@ -51,7 +51,7 @@
       </form>
   </div>
 
-  <div class="row mt-3">
+  <div class="mt-3" >
     <div class="card">
       <div class="card-header">
         Board List
@@ -111,6 +111,28 @@
       </div>
     </div>
   </div>
+
+
+
+  <!-- Modal UI start-->
+  <div class="modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Message</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>[[${result}]]번 게시글 정상적으로 등록되었습니다.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+<!--          <button type="button" class="btn btn-primary">Save changes</button>-->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal UI  end-->
 </div>
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
@@ -120,6 +142,17 @@
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
 <script layout:fragment="myscript" th:inline="javascript">
+  // 서버로 부터 응답받은 메시지: db처리한 후 결과 값 전송한 객체
+  const result = [[${result}]]
+  console.log('result',result);
+
+  // show modal창에 메시지 출력하기
+  const modal = new bootstrap.Modal(document.querySelector('.modal'));
+  if (result) modal.show();
+
+
+
+
   // 1. 페이징 번호 클릭시 처리하는 함수
   document.querySelector('.pagination').addEventListener('click', function(e) {
     e.preventDefault(); // 기본 이벤트 제거
