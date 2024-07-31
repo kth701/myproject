@@ -84,6 +84,8 @@ public class BoardServiceImpl implements BoardService {
             .map( board -> modelMapper.map(board,BoardDTO.class ) )
             .collect(Collectors.toList());
 
+    // 매개변수로 전달받은 객체(pageRequestDTO)를 가지고 PageResponseDTO.Builder()를 통해
+    // PageRequestDTO객체 생성되어 필요시 스프링이 필요시점에 주입 시켜줌(list에서 pageRequestDTO객체 사용가능함 )
     return PageResponseDTO.<BoardDTO>withAll()
         .pageRequestDTO(pageRequestDTO)
         .dtoList(dtoList)

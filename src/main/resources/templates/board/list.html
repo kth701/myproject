@@ -6,8 +6,10 @@
 
 <!-- 현재 페이지에서만 사용하는 컨텐츠(내용) 정의 -->
 <div layout:fragment="content" class="p-3">
+<!--  <div th:text="${pageRequestDTO}"></div>-->
 <!--  <div th:text="${responseDTO.dtoList}"></div>-->
   <div th:text="${pageRequestDTO.getLink()}"></div>
+
   <hr>
   <!-- 검색 키워드 -->
   <div class="row mt-3 ">
@@ -36,7 +38,9 @@
             </div>
             <!-- 전송 -->
             <div class="input-group-append col">
+              <!-- 아래와 동일한 submit기능 -->
               <button type="search" class="btn btn-outline-secondary searchBtn">Search</button>
+              <!-- <button type="submit" class="btn btn-outline-secondary searchBtn2">Search2</button> -->
               <button type="button"  class="btn btn-outline-secondary clearBtn">Clear</button>
             </div>
 
@@ -116,6 +120,7 @@
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
 <script layout:fragment="myscript" th:inline="javascript">
+  // 1. 페이징 번호 클릭시 처리하는 함수
   document.querySelector('.pagination').addEventListener('click', function(e) {
     e.preventDefault(); // 기본 이벤트 제거
     e.stopPropagation();// 현재 이벤트가 발생한 요소의 상위요소들에 대해서는 이벤트 감지 제거
@@ -130,9 +135,20 @@
     formObj.innerHTML += `<input type='hidden' name='page' value='${num}'>`
     formObj.submit();
 
-    //location.href="/board/list/page="+num; // 클릭한 페이지번호
+    // location.href="/board/list/page="+num; // 클릭한 페이지번호
 
   })
+
+  // clearBtn클릭시 처리하는 부분
+   document.querySelector('.clearBtn').addEventListener('click', function(e) {
+     e.preventDefault();// submit()기능 제거
+     e.stopPropagation();
+     console.log('clear Button click..')
+
+     self.location = '/board/list'
+
+   })
+
 </script>
 
 </html>
