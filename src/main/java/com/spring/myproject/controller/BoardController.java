@@ -32,6 +32,7 @@ public class BoardController {
   @GetMapping("/list")
   public String list(PageRequestDTO pageRequestDTO, Model model){
     // PageRequestDTO 객체 생성만 했을 경우 기본값 설정
+    log.info("=? /list: "+pageRequestDTO);
 
     PageResponseDTO responseDTO = boardService.list(pageRequestDTO);
     log.info("=> "+responseDTO);

@@ -21,6 +21,8 @@ import java.util.Map;
 @Log4j2
 public class CustomRestControllerAdvice {
 
+  // RestControlle에서 BindException예외가 발생하면
+  // handleBindException 메서드가 수행
   @ExceptionHandler(BindException.class)
   @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
   public ResponseEntity<Map<String, String>> handleBindException( BindException e ){
@@ -39,6 +41,8 @@ public class CustomRestControllerAdvice {
     }
 
     return ResponseEntity.badRequest().body(errorMap);
+    //return new ResponseEntity<List<MemberVO>>(list, HttpStatus.INTERNAL_SERVER_ERROR); // 500 code
+    //return new ResponseEntity<List<MemberVO>>(list, HttpStatus.OK);// 200 code
   }
 
 }

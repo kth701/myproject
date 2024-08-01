@@ -21,10 +21,12 @@ public class SwaggerConfig {
 
   private Info apiInfo() {
     return new Info()
-        .title("API Test") // API의 제목
-        .description("Let's practice Swagger UI") // API에 대한 설명
+        .title("Springdoc 테스트") // API의 제목
+        .description("Springdoc을 사용한 Swagger UI 테스트") // API에 대한 설명
         .version("1.0.0"); // API의 버전
   }
+
+
 }
 
 
@@ -56,4 +58,29 @@ public class SwaggerConfig {
                 .version("1.0.0"); // API의 버전
     }
 }
+ */
+
+/*
+Springdoc 공식 가이드에서 설명하는 어노테이션의 변화는 다음과 같다.
+
+@Api → @Tag
+@ApiIgnore
+  → @Parameter(hidden = true) or @Operation(hidden = true) or @Hidden
+@ApiImplicitParam
+  → @Parameter
+@ApiImplicitParams
+  → @Parameters
+@ApiModel
+  → @Schema
+@ApiModelProperty(hidden = true)
+  → @Schema(accessMode = READ_ONLY)
+@ApiModelProperty
+  → @Schema
+@ApiOperation(value = "foo", notes = "bar")
+  → @Operation(summary = "foo", description = "bar")
+@ApiParam
+  → @Parameter
+@ApiResponse(code = 404, message = "foo")
+  → @ApiResponse(responseCode = "404", description = "foo")
+
  */

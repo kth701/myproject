@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 @Builder
@@ -38,6 +37,7 @@ public class PageRequestDTO {
     private String link;
     public String getLink(){
         if (link == null) {
+
             StringBuilder builder = new StringBuilder();
             builder.append("page="+this.page);
             builder.append("&size="+this.size);
