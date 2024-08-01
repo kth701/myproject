@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/basic}"    >
+
+
+<!-- 현재 페이지에서만 사용하는 컨텐츠(내용) 정의 -->
+<div layout:fragment="content" class="p-4">
+
+    <div class="card">
+      <div class="card-header">
+        Board Modify
+      </div>
+
+      <div class="card-body m-4">
+        <form action="/board/modify"
+              th:action="@{/board/modify}" method="post" id="f1">
+          <!-- 1. 글 제목 -->
+          <div class="form-floating mb-3">
+
+            <input type="text" 	class="form-control"
+                   id="bno"
+                   name="bno"  th:value="${dto.bno}" readonly  >
+            <label for="title" >Bno</label>
+          </div>
+
+          <!-- 1. 글 제목 -->
+          <div class="form-floating mb-3">
+
+            <input type="text" 	class="form-control"
+                   id="title"
+                   name="title"   th:value="${dto.title}"
+                   placeholder="2자이상 100이내로 작성하세요">
+            <label for="title" >Title</label>
+          </div>
+
+          <!-- 2. 게시글 내용 -->
+          <div class="form-floating mb-3">
+            <!-- bootstrap에서 textarear rows 적용시 class가 "h-25"설정되어야 함. -->
+            <textarea class="form-control h-25"
+                      id="content"
+                      name="content"
+                      rows="10"
+                       >[[${dto.content}]]</textarea>
+            <label for="content" >Comments</label>
+
+          </div>
+          <!-- 3. 게시글 작성자 -->
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control"
+                   id="writer"
+                   name="writer" th:value="${dto.writer}" readonly
+                   placeholder="반드시 내용이 입력되어야 합니다." >
+            <label for="writer">Writer</label>
+          </div>
+
+          <!-- 4. 게시글 이미지 첨부파일 -->
+<!--          <div class="form-floating mb-3">-->
+<!--            <input type="text" class="form-control"-->
+<!--                   id="writer"-->
+<!--                   name="writer" th:value="${dto.writer}" readonly-->
+<!--                   placeholder="반드시 내용이 입력되어야 합니다." >-->
+<!--            <label for="writer">Writer</label>-->
+<!--          </div>          -->
+          <!-- 4. 게시글 등록일, 수정일 -->
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control"
+                   id="regDate"
+                   th:value="${#temporals.format(dto.regDate, 'yyyy-MM-dd HH:mm:ss')}" readonly
+                   >
+            <label for="regDate">RegDate</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control"
+                   id="modDate"
+                   th:value="${#temporals.format(dto.modDate, 'yyyy-MM-dd HH:mm:ss')}" readonly
+                    >
+            <label for="modDate">ModDate</label>
+          </div>
+
+          <!-- 4. List, Modify 버튼-->
+          <div class="my-4">
+            <button type="button" class="btn btn-primary   listBtn">List</button>
+            <button type="button" class="btn btn-secondary modBtn" >Modify</button>
+            <button type="button" class="btn btn-danger    removeBtn" >Remove</button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+
+</div>
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<style layout:fragment="mystyle" th:inline="css">
+
+
+</style>
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<script layout:fragment="myscript" th:inline="javascript">
+
+  // 서버로 부터 응답받은 메시지: db처리한 후 결과 값 전송한 객체
+  const errors = [[${errors}]]
+  console.log('errors',errors);
+
+  let errMessage = "";
+  if (errors) {// 서버로 부터 응답 에러 메시지 처리
+    for (let i=0; i<errors.length; i++){
+      errMessage += `${errors[i].field}은 ${errors[i].code}\n`;
+    }
+
+    // 웹브라우저의 세션 기록을 관리하는 JavaScript의 History API메서드
+    // 브라우저의 세션 기록을 수정하거 대체하는 역할
+    //history.replaceState({},null, null);
+
+    alert(errMessage)
+  }
+
+  // 현재 글번호 게시글 페이징 정보
+  const link = [[${pageRequestDTO.getLink()}]]
+  const formObj = document.querySelector("#f1")
+
+
+  // 1. Modify 버튼 기능 처리
+  document.querySelector('.modBtn').addEventListener('click', function(e){
+    e.stopPropagation();// 현재 요소의 이벤트발생을 상위요소에서 이벤트 감지 하지 않게 기능
+    e.preventDefault(); // 기본 기능 제거
+    console.log("modify")
+
+    // javascript에서 action, method 속성 변경: 페이징 정보 추가
+    formObj.action = `/board/modify?${link}`
+    formObj.method = 'post';
+    formObj.submit();     // POST방식
+
+    // Get방식(수정페이지요청)
+    //self.location=`/board/modify?${link}`
+  });
+
+  // 2. List 버튼 기능 처리
+  document.querySelector('.listBtn').addEventListener('click', function(e){
+    e.stopPropagation();
+    e.preventDefault(); // 기본 기능 제거
+    console.log("list")
+
+    // 전송 기능
+    //formObj.submit();
+
+    // 리셋 기능(폼값 초기화)
+    //formObj.reset();
+
+    self.location=`/board/list?${link}`
+  });
+
+  // 3. Remove 버튼 기능 처리
+  document.querySelector('.removeBtn').addEventListener('click', function(e){
+    e.stopPropagation();
+    e.preventDefault(); // 기본 기능 제거
+    console.log("remove")
+
+    // javascript에서 action, method 속성 변경
+    formObj.action = `/board/remove`
+    formObj.method = 'post';
+    formObj.submit();
+
+  });
+
+
+
+
+</script>
+
+</html>
+
+<!--
+  사용목적 요약
+
+- 현재 페이지의 URL을 새로운 URL로 변경
+- 이에 따라 페이지의 상태 정보도 업데이트
+- 실제로 페이지의 리로드나 네트워크 요청은 발생하지 않음
+- 사용자 경험을 개선하면서도 페이지 간 전환이나 상태 관리를 자유롭게 제어
+
+ex(
+// 현재 URL: http://example.com/page1
+const newState = { data: 'some data' };
+// 현재 URL과 상태를 새로운 URL과 상태로 변경
+history.replaceState(newState, '', 'http://example.com/page2');
+
+-->

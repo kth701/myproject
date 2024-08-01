@@ -8,7 +8,7 @@
 <div layout:fragment="content" class="p-3">
 <!--  <div th:text="${pageRequestDTO}"></div>-->
 <!--  <div th:text="${responseDTO.dtoList}"></div>-->
-  <div th:text="${pageRequestDTO.getLink()}"></div>
+<!--  <div th:text="${pageRequestDTO.getLink()}"></div>-->
 
   <hr>
   <!-- 검색 키워드 -->
@@ -123,7 +123,8 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p>[[${result}]]번 게시글 정상적으로 등록되었습니다.</p>
+          <!-- 메시지 전달 하는 부분 -->
+          <p id="modal_message"></p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -142,13 +143,32 @@
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
 <script layout:fragment="myscript" th:inline="javascript">
+
   // 서버로 부터 응답받은 메시지: db처리한 후 결과 값 전송한 객체
   const result = [[${result}]]
+  const bno = [[${bno}]]
   console.log('result',result);
 
   // show modal창에 메시지 출력하기
   const modal = new bootstrap.Modal(document.querySelector('.modal'));
-  if (result) modal.show();
+
+  let message = "";
+  if (result) {
+    if (result=="removed"){
+      message = bno+"번 글번호 게시글이 삭제 되었습니다.";
+    } else if (result=="modified") {
+     message = bno+"번 글번호 게시글이 수정 되었습니다.";
+    } else if (result=="registered"){
+     message = bno+"번 글번호가 게시글 등록 되었습니다.";
+    }
+
+    // 모달 창에 전달할 메시지 태그 요소 추출
+    const modal_message = document.querySelector('#modal_message');
+    // 메시지 문자열를 태그요소에 넣기
+    modal_message.innerHTML = message;
+    // 모달 창 표시
+    modal.show();
+  }
 
 
 

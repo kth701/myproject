@@ -53,12 +53,31 @@
                    placeholder="반드시 내용이 입력되어야 합니다." >
             <label for="writer">Writer</label>
           </div>
+          <!-- 4. 게시글 등록일, 수정일 -->
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control"
+                   id="regDate"
+                   th:value="${#temporals.format(dto.regDate, 'yyyy-MM-dd HH:mm:ss')}" readonly
+                   >
+            <label for="regDate">RegDate</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control"
+                   id="modDate"
+                   th:value="${#temporals.format(dto.modDate, 'yyyy-MM-dd HH:mm:ss')}" readonly
+                    >
+            <label for="modDate">ModDate</label>
+          </div>
 
-          <!-- 3. 글 보내기 버튼 -->
+
+          <!-- 4. List, Modify 버튼-->
           <div class="my-4">
-            <div class="float-end">
-            <button type="button" class="btn btn-primary submitBtn">List</button>
-            <button type="button" class="btn btn-secondary" >Modify</button>
+            <!-- 현 글번호에 대한 페이징 정보를 넘겨받아서 list요청시 페이징 정보와 같이 요청하면 현재 글번호가 해당되는 list페이지 추출됨 -->
+            <div class="float-end" th:with="link=${pageRequestDTO.getLink()}">
+              <a th:href="|@{/board/list}?${link}|">
+                <button type="button" class="btn btn-primary ">List</button></a>
+              <a th:href="|@{/board/modify(bno=${dto.bno})}&${link}|">
+                <button type="button" class="btn btn-secondary" >Modify</button></a>
             </div>
           </div>
 
@@ -67,6 +86,28 @@
 
     </div>
 
+
+
+  <!-- Modal UI start-->
+  <div class="modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Message</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- 메시지 전달 하는 부분 -->
+          <p id="modal_message"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <!--          <button type="button" class="btn btn-primary">Save changes</button>-->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal UI  end-->
 </div>
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
@@ -78,20 +119,27 @@
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
 <script layout:fragment="myscript" th:inline="javascript">
 
+    //서버로 부터 응답받은 메시지: db처리한 후 결과 값 전송한 객체
+    const result = [[${result}]]
+    const bno = [[${bno}]]
 
-  // form 하위요소 객체에 대한 변수 선언
-  const formObj =  document.querySelector('form')
-  const title = document.querySelector('#title');
-  const content = document.querySelector('#content');
-  const writer = document.querySelector('#writer');
+    // show modal창에 메시지 출력하기
+    const modal = new bootstrap.Modal(document.querySelector('.modal'));
 
-  // 클라이언트에서 먼저 입력항목에 대한 유효성 검사 처리
-  document.querySelector('.submitBtn').addEventListener('click', function(e){
-    e.stopPropagation();
-    e.preventDefault(); // submit()기본 기능 제거
+    let message = "";
+    if (result) { // 응답이 있을 경우만 처리
+      if (result=="modified"){// 응답 객체 내용이 "modified"이면 처리
+          message = bno+"번 글번호 게시글이 수정 되었습니다.";
 
+          // 모달 창에 전달할 메시지 태그 요소 추출
+          const modal_message = document.querySelector('#modal_message');
+          // 메시지 문자열를 태그요소에 넣기
+          modal_message.innerHTML = message;
 
-  });
+          // 모달 창 표시
+          modal.show();
+      }
+    }
 
 
 

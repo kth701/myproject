@@ -25,7 +25,7 @@ public class BoardDTO {
   private String writer;
 
   private LocalDateTime regDate;
-  private LocalDateTime modDdate;
+  private LocalDateTime modDate;
 
   // 첨부파일 이름
 }
