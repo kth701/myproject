@@ -2,10 +2,13 @@ package com.spring.myproject.repository.search;
 
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
+import com.spring.myproject.dto.BoardListReplyCountDTO;
 import com.spring.myproject.entity.Board;
 
 import com.spring.myproject.entity.QBoard;
+import com.spring.myproject.entity.QReply;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 
@@ -150,6 +153,60 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
 
 
     return new PageImpl<>(list, pageable, count);
+  }
+
+  // 특정 게시글에 대한 댓글 개수 계산하는 인터페이스 구현
+  @Override
+  public Page<BoardListReplyCountDTO> searchWithReplyCount(String[] types, String keyword, Pageable pageable) {
+
+    QBoard board = QBoard.board;
+    QReply reply = QReply.reply;
+
+    // 1. query 작성
+    JPQLQuery<Board>  query = from(board);
+    query.leftJoin(reply).on(reply.board.eq(board)); // reply.board_bno == board.bno
+
+    query.groupBy(board); // group by board.bno
+
+    // 조건문 추가 : where 문 작성
+    if ( (types != null && types.length > 0) && keyword != null){// 검색 키워드가 있으면
+      //  BooleanBuilder: 조건문을 작성하는 클래스
+      BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+      for (String type : types){
+        switch (type){
+          case "t":
+            booleanBuilder.or(board.title.contains(keyword));break;
+          case "c":
+            booleanBuilder.or(board.content.contains(keyword));break;
+          case "w":
+            booleanBuilder.or(board.writer.contains(keyword));break;
+        }
+      } // end for
+
+      query.where(booleanBuilder);
+    }// end if
+
+    // bno > 0 : board테이블에 자료가 존재 하면이라는 조건
+    query.where(board.bno.gt(0L));
+
+    // Projection.bean(): JPA에서 프로젝션: JPQL의 결과를 바로 DTO로 처리하는 기능
+    JPQLQuery<BoardListReplyCountDTO> dtoQuery =
+        query.select(Projections.bean(
+            BoardListReplyCountDTO.class,// DTO 타입 선언
+
+            board.bno,
+            board.title,
+            board.writer,
+            board.regDate,
+
+            reply.count().as("replyCount")
+
+        ));
+
+
+
+    return null;
   }
 
 }
