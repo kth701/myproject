@@ -1,5 +1,6 @@
 package com.spring.myproject.repository;
 
+import com.spring.myproject.dto.BoardListReplyCountDTO;
 import com.spring.myproject.entity.Board;
 import lombok.extern.log4j.Log4j2;
 import org.assertj.core.api.Assert;
@@ -18,9 +19,6 @@ import org.springframework.data.domain.Sort;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
-
-
-
 
 
 @SpringBootTest
@@ -160,4 +158,38 @@ class BoardRepositoryTest {
 
 
   }
-}
+
+
+  //-----------------------------------------//
+  // 조건검색 결과에 대한 댓글 개수
+  //-----------------------------------------//
+  @Test
+  @DisplayName("SearchReplyCount 테스트")
+  public void testSearchReplyCount(){
+    //given
+    Pageable pageable = PageRequest.of(0,5, Sort.by("bno").ascending());
+    //Pageable pageable = PageRequest.of(0,5, Sort.by("bno").descending());
+    String[] types = {"t","c","w"}; // 키워드 , 타입
+    String keyword = "1";
+
+    Page<BoardListReplyCountDTO> result = boardRepository.searchWithReplyCount(types, keyword, pageable);
+
+    log.info("=> total page:"+result.getTotalPages());
+    log.info("=> page size:"+result.getSize());
+    log.info("=> pageNumber:"+result.getNumber());
+    log.info("=> prev next:"+result.hasPrevious()+","+result.hasNext());
+    log.info("====");
+    result.getContent().forEach(board-> log.info(board));
+  }
+
+
+
+
+
+
+
+
+
+} // end Test Class
+
+

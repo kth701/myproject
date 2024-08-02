@@ -200,13 +200,18 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
             board.writer,
             board.regDate,
 
+            // reply테이블에서 그룹핑 기준으로 reply개수 계산
             reply.count().as("replyCount")
 
         ));
 
+    // 2. paging 추가
+    this.getQuerydsl().applyPagination(pageable,query);
+    // 3. query 실행
+    List<BoardListReplyCountDTO> dtoList = dtoQuery.fetch();
+    long count = dtoQuery.fetchCount();
 
-
-    return null;
+    return new PageImpl<>(dtoList, pageable, count);
   }
 
 }

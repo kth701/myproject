@@ -2,6 +2,7 @@ package com.spring.myproject.controller;
 
 
 import com.spring.myproject.dto.BoardDTO;
+import com.spring.myproject.dto.BoardListReplyCountDTO;
 import com.spring.myproject.dto.PageRequestDTO;
 import com.spring.myproject.dto.PageResponseDTO;
 import com.spring.myproject.service.BoardService;
@@ -34,7 +35,11 @@ public class BoardController {
     // PageRequestDTO 객체 생성만 했을 경우 기본값 설정
     log.info("=? /list: "+pageRequestDTO);
 
-    PageResponseDTO responseDTO = boardService.list(pageRequestDTO);
+    // 1-1. 게시글 댓글 개수 없는 List 조회
+    //PageResponseDTO responseDTO = boardService.list(pageRequestDTO);
+
+    // 1-2. 게시글 댓글 개수 있는 List 조회
+    PageResponseDTO<BoardListReplyCountDTO> responseDTO = boardService.listWithReplyCount(pageRequestDTO);
     log.info("=> "+responseDTO);
 
     model.addAttribute("responseDTO", responseDTO);

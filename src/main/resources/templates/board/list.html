@@ -83,6 +83,11 @@
               <!-- "board/read?bno=101"+"&"+"page=1&size=10" -->
               <a href="#" th:href="|@{/board/read(bno=${dto.bno})}&${link}|"
                  class="text-decoration-none">[[${dto.title}]]</a>
+
+              <!-- 게시글에 대한 댓글 개수 출력 추가 -->
+              <span class="badge progress-bar-success" style="background-color:#0a53b3">
+                [[${dto.replyCount}]]+
+              </span>
             </td>
             <td>[[${dto.writer}]]</td>
             <td>[[${   #temporals.format(dto.regDate, "yyyy-MM-dd")  }]]</td>
