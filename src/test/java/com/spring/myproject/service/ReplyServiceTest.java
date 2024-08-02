@@ -27,7 +27,7 @@ class ReplyServiceTest {
     ReplyDTO replyDTO = ReplyDTO.builder()
         .replyText("ReplyDTO text2")
         .replyer("replyer2")
-        .bno(board.getBno())
+        .board(board)
         .build();
 
     // 댓글 등록 서비스 호출하여 실행

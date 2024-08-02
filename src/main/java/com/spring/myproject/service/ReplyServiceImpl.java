@@ -3,7 +3,9 @@ package com.spring.myproject.service;
 import com.spring.myproject.dto.PageRequestDTO;
 import com.spring.myproject.dto.PageResponseDTO;
 import com.spring.myproject.dto.ReplyDTO;
+import com.spring.myproject.entity.Board;
 import com.spring.myproject.entity.Reply;
+import com.spring.myproject.repository.BoardRepository;
 import com.spring.myproject.repository.ReplyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ReplyServiceImpl implements ReplyService {
 
+  private final BoardRepository boardRepository;
   private final ReplyRepository replyRepository;
   private final ModelMapper modelMapper;
 
@@ -31,13 +34,17 @@ public class ReplyServiceImpl implements ReplyService {
   @Override
   public Long register(ReplyDTO replyDTO) {
 
+    // 게시글 번호 =>  board Entity 읽기
+    Board board = boardRepository.findById(replyDTO.getBno()).orElseThrow();
+    replyDTO.setBoard(board);
+
     // 1.1  dto -> entity
     Reply reply = modelMapper.map(replyDTO, Reply.class);
     Long rno = replyRepository.save(reply).getRno();
 
     return rno;
   }
-
+  // 2. 댓글 조회 구현
   @Override
   public ReplyDTO read(Long rno) {
     Optional<Reply> replyOptional = replyRepository.findById(rno);
@@ -45,23 +52,23 @@ public class ReplyServiceImpl implements ReplyService {
 
     return modelMapper.map(reply, ReplyDTO.class);
   }
-
+  // 3. 댓글 수정 구현
   @Override
   public void modify(ReplyDTO replyDTO) {
     Optional<Reply> replyOptional = replyRepository.findById(replyDTO.getRno());
     Reply reply = replyOptional.orElseThrow();
 
-    // 댓글 내용 수정
+    // 댓글 내용 수정 구현
     reply.changeText(replyDTO.getReplyText());
     // db 반영
     replyRepository.save(reply);
   }
-
+  // 4. 댓글 삭제 구현
   @Override
   public void remove(Long rno) {
     replyRepository.deleteById(rno);
   }
-
+  // 5. 댓글 목록(페이징 기능이 있는 List) 구현
   @Override
   public PageResponseDTO<ReplyDTO> getListOBoard(Long bno,
                                                  PageRequestDTO pageRequestDTO) {

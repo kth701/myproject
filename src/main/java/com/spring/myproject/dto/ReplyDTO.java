@@ -19,8 +19,8 @@ public class ReplyDTO {
 
   // spring-boot-starter-validation: 서버 유효성 검사 라이브러리
   @NotNull
-  private Long bno;// 댓글의 부모
-  //private Board board;
+  private Long bno;       // 댓글의 부모: 클라이언트로 부터 넘어온 게시글 번호
+  private Board board;    // replyDTO와 reply Entity 맵핑을 위한 객체
 
   @NotEmpty
   private String replyText;

@@ -1,11 +1,18 @@
 package com.spring.myproject.controller;
 
 
+import com.spring.myproject.dto.PageRequestDTO;
+import com.spring.myproject.dto.PageResponseDTO;
 import com.spring.myproject.dto.ReplyDTO;
+import com.spring.myproject.entity.Board;
+import com.spring.myproject.repository.BoardRepository;
+import com.spring.myproject.service.BoardService;
+import com.spring.myproject.service.ReplyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BindException;
@@ -13,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.naming.Binding;
+import java.util.List;
 import java.util.Map;
 
 // REST방식 : 주로 XML, JSON형태의 문자열을 전송하고 이를 컨트롤러에서 처리하는 방식
@@ -20,9 +28,13 @@ import java.util.Map;
 @RestController
 @RequestMapping("/replies")
 @Log4j2
+@RequiredArgsConstructor
 public class ReplyController {
 
-  /*
+  private  final ReplyService replyService; // 댓글 서비스 객체
+
+
+  /* 더미 데이터로 테스트
   @PostMapping(value="/", consumes = MediaType.APPLICATION_JSON_VALUE)// 전송받은 data 종류 명시
   public ResponseEntity<Map<String, Long>> register(@RequestBody ReplyDTO replyDTO){
       log.info("=> replyDTO: "+replyDTO);
@@ -45,7 +57,7 @@ public class ReplyController {
                     ) throws BindException {
 
     log.info("=> replyDTO: "+replyDTO);
-    log.info("=> bindingResult: "+bindingResult.toString());
+    //log.info("=> bindingResult: "+bindingResult.toString());
 
     // 에러가 존재하면 BindException예외 발생시킴
     // => RestController예외처리를 해주는  @RestControllerAdvice어노테이션
@@ -53,11 +65,32 @@ public class ReplyController {
       throw new BindException(bindingResult);
     }
 
-    Map<String, Long> resultMap = Map.of("rno", 222L);
+
+    Long rno = replyService.register(replyDTO);
+    Map<String, Long> resultMap = Map.of("rno", rno);
 
     return resultMap;
   }
 
+
+  @Operation(summary="Replies of Board", description="Pet방식으로 특정 게시물의 댓글 목록")
+  @GetMapping(value="/list/{bno}")
+  public   Map<String, List<ReplyDTO>> getList(@PathVariable("bno") Long bno,
+                                           PageRequestDTO pageRequestDTO){
+
+    PageResponseDTO<ReplyDTO> responseDTO = replyService.getListOBoard(bno, pageRequestDTO);
+    responseDTO.getDtoList().stream().forEach( reply -> log.info("=> "+reply));
+
+    Map<String, List<ReplyDTO>> resultMap = Map.of("list", responseDTO.getDtoList());
+    return resultMap;
+  }
+
+
+
+
+
+
+  /*  RestController Test */
 
   @PostMapping(value = "/test3", consumes = MediaType.APPLICATION_JSON_VALUE)
   public Map<String,Long> register2(
