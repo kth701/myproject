@@ -198,7 +198,7 @@
     }
     // 다음`
     if (data.next) {
-    pageStr += `<li class="page-item"><a class="page-link" data-page="${data.start+1}">다음</a></li>`
+    pageStr += `<li class="page-item"><a class="page-link" data-page="${data.end+1}">다음</a></li>`
     }
 
     replyPaging.innerHTML = pageStr;
@@ -266,6 +266,7 @@
     // 현재 클릭한 태그 요소의 페이지 번호 추출0
     const pageNum = target.getAttribute("data-page");
     page = pageNum;
+    console.log("page number:",page)
     printReplies(page, size)
 
   });
