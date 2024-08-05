@@ -35,11 +35,15 @@ public class ReplyServiceImpl implements ReplyService {
   public Long register(ReplyDTO replyDTO) {
 
     // 게시글 번호 =>  board Entity 읽기
-    Board board = boardRepository.findById(replyDTO.getBno()).orElseThrow();
-    replyDTO.setBoard(board);
+    //Board board = boardRepository.findById(replyDTO.getBno()).orElseThrow();
+    //replyDTO.setBoard(board);
 
     // 1.1  dto -> entity
-    Reply reply = modelMapper.map(replyDTO, Reply.class);
+    //Reply reply = modelMapper.map(replyDTO, Reply.class);
+
+    // dto -> entity
+    Reply reply = dtoToEntity(replyDTO);
+    // entity -> db에 반영
     Long rno = replyRepository.save(reply).getRno();
 
     return rno;
@@ -50,7 +54,8 @@ public class ReplyServiceImpl implements ReplyService {
     Optional<Reply> replyOptional = replyRepository.findById(rno);
     Reply reply = replyOptional.orElseThrow();
 
-    return modelMapper.map(reply, ReplyDTO.class);
+    //return modelMapper.map(reply, ReplyDTO.class);
+    return entityToDTO(reply);
   }
   // 3. 댓글 수정 구현
   @Override
@@ -66,8 +71,10 @@ public class ReplyServiceImpl implements ReplyService {
   // 4. 댓글 삭제 구현
   @Override
   public void remove(Long rno) {
+    log.info("reply remove rno:"+rno);
     replyRepository.deleteById(rno);
   }
+
   // 5. 댓글 목록(페이징 기능이 있는 List) 구현
   @Override
   public PageResponseDTO<ReplyDTO> getListOBoard(Long bno,
@@ -86,7 +93,8 @@ public class ReplyServiceImpl implements ReplyService {
     List<ReplyDTO> dtoList =
         result.getContent()
             .stream()
-            .map(reply -> modelMapper.map(reply, ReplyDTO.class))
+            //.map(reply -> modelMapper.map(reply, ReplyDTO.class))
+            .map(reply -> entityToDTO(reply))
             .collect(Collectors.toList());
 
     return PageResponseDTO.<ReplyDTO>withAll()

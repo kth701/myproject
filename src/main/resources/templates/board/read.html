@@ -85,9 +85,33 @@
       </div>
 
     </div>
+  <!-- --------------------------------------------------------------------  -->
+  <!-- 댓글 list view -->
+  <div class="row mt-3">
+    <div class="col-md-12">
+      <div class="my-4">
+        <button class="btn btn-info addReplyBtn">ADD REPLY</button>
+      </div>
+      <div>
+        <ul class="list-group replyList">
+          댓글리스트
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- 댓글 페이징 -->
+  <div class="row mt-3">
+    <div class="col">
+      <ul class="pagination replyPaging">
+        댓글 페이징 번호
+      </ul>
+    </div>
+  </div>
 
 
 
+
+  <!-- --------------------------------------------------------------------  -->
   <!-- Modal UI start-->
   <div class="modal" tabindex="-1">
     <div class="modal-dialog">
@@ -108,7 +132,18 @@
     </div>
   </div>
   <!-- Modal UI  end-->
+  <!-- --------------------------------------------------------------------  -->
+
+
+  <!-- Axios 라이브러리 연결 -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="/js/reply.js"></script>
 </div>
+
+
+
+
+
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
 <style layout:fragment="mystyle" th:inline="css">
@@ -119,31 +154,56 @@
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
 <script layout:fragment="myscript" th:inline="javascript">
 
-    //서버로 부터 응답받은 메시지: db처리한 후 결과 값 전송한 객체
-    const result = [[${result}]]
-    const bno = [[${bno}]]
 
-    // show modal창에 메시지 출력하기
-    const modal = new bootstrap.Modal(document.querySelector('.modal'));
+  const reply_bno = document.querySelector('#bno').value;
 
-    let message = "";
-    if (result) { // 응답이 있을 경우만 처리
-      if (result=="modified"){// 응답 객체 내용이 "modified"이면 처리
-          message = bno+"번 글번호 게시글이 수정 되었습니다.";
+  // ------------------------------------------------------ //
+  // 특정 게시글에 대한 댓글 조회 : axios(비동기) 요청 테스트
+  // ------------------------------------------------------ //
+  // 비동기 처리방식
+  getReply(reply_bno)
+        .then( data => {
+                console.log(data);
+                console.log(data.list);
+         })
+        .catch( e => {console.log(e)});
+  // ------------------------------------------------------ //
 
-          // 모달 창에 전달할 메시지 태그 요소 추출
-          const modal_message = document.querySelector('#modal_message');
-          // 메시지 문자열를 태그요소에 넣기
-          modal_message.innerHTML = message;
 
-          // 모달 창 표시
-          modal.show();
-      }
+
+
+
+
+
+  //서버로 부터 응답받은 메시지: db처리한 후 결과 값 전송한 객체
+  const result = [[${result}]]
+  const bno = [[${bno}]]
+
+
+
+
+  // show modal창에 메시지 출력하기
+  const modal = new bootstrap.Modal(document.querySelector('.modal'));
+
+  let message = "";
+  if (result) { // 응답이 있을 경우만 처리
+    if (result=="modified"){// 응답 객체 내용이 "modified"이면 처리
+        message = bno+"번 글번호 게시글이 수정 되었습니다.";
+
+        // 모달 창에 전달할 메시지 태그 요소 추출
+        const modal_message = document.querySelector('#modal_message');
+        // 메시지 문자열를 태그요소에 넣기
+        modal_message.innerHTML = message;
+
+        // 모달 창 표시
+        modal.show();
     }
+  }
 
 
 
 
 </script>
+
 
 </html>
