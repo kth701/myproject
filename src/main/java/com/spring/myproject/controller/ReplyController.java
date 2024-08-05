@@ -98,15 +98,19 @@ public class ReplyController {
   // 2. 특정 게시물의 댓글 목록
   @Operation(summary="Replies of Board", description="Post방식으로 특정 게시물의 댓글 목록")
   @GetMapping(value="/list/{bno}")
-  public   Map<String, List<ReplyDTO>> getList(
+//  public   Map<String, List<ReplyDTO>> getList(
+  public  PageResponseDTO<ReplyDTO> getList(
                                         @PathVariable("bno") Long bno,
                                         PageRequestDTO pageRequestDTO){
 
     PageResponseDTO<ReplyDTO> responseDTO = replyService.getListOBoard(bno, pageRequestDTO);
-    responseDTO.getDtoList().stream().forEach( reply -> log.info("=> "+reply));
 
-    Map<String, List<ReplyDTO>> resultMap = Map.of("list", responseDTO.getDtoList());
-    return resultMap;
+    //responseDTO.getDtoList().stream().forEach( reply -> log.info("=> "+reply));
+    //Map<String, List<ReplyDTO>> resultMap = Map.of("list", responseDTO.getDtoList());
+    //return resultMap;
+
+    // 서버쪽에 클라이언체 보내는 데이터 : 페이징 객체, 댓글 list,...
+    return responseDTO;
   }
 
 

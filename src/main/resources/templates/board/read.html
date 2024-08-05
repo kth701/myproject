@@ -92,7 +92,7 @@
       <div class="my-4">
         <button class="btn btn-info addReplyBtn">ADD REPLY</button>
       </div>
-      <div>
+      <div class="">
         <ul class="list-group replyList">
           댓글리스트
         </ul>
@@ -154,20 +154,121 @@
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
 <script layout:fragment="myscript" th:inline="javascript">
 
+  //서버로 부터 응답받은 메시지: db처리한 후 결과 값 전송한 객체
+  const result = [[${result}]]
+  const bno = [[${dto.bno}]]  // 전역 변수
 
-  const reply_bno = document.querySelector('#bno').value;
+  /*
+  //const reply_bno = document.querySelector('#bno').value;
+  //console.log("reply_bno:", reply_bno);
+  console.log("dto_bno:", bno);
 
   // ------------------------------------------------------ //
   // 특정 게시글에 대한 댓글 조회 : axios(비동기) 요청 테스트
   // ------------------------------------------------------ //
   // 비동기 처리방식
-  getReply(reply_bno)
+  getReply(bno)
         .then( data => {
                 console.log(data);
                 console.log(data.list);
          })
         .catch( e => {console.log(e)});
   // ------------------------------------------------------ //
+  */
+
+
+  const replyBnoList = document.querySelector('.replyList'); // 댓글 목록 DOM
+  const replyPaging = document.querySelector('.replyPaging');// 페이지 목록 DOM
+
+  // 4. 페이징 처리
+  function printPages(data){
+    console.log("paging:", data);
+
+    // pagination
+    let pageStr = ''
+
+    // 이전
+    if (data.prev) {
+      pageStr += `<li class="page-item"><a class="page-link" data-page="${data.start-1}">이전</a></li>`
+    }
+
+    // 페이지번호
+    for (let i=data.start; i<=data.end; i++){
+      pageStr += `<li class="page-item ${i==data.page?"active":""}"><a class="page-link" data-page="${i}">${i}</a></li>`
+    }
+    // 다음`
+    if (data.next) {
+    pageStr += `<li class="page-item"><a class="page-link" data-page="${data.start+1}">다음</a></li>`
+    }
+
+    replyPaging.innerHTML = pageStr;
+
+  }
+
+  // 3. 서버로 부터 받아온 댓글을 DOM을 구성할 수 있는 문자열 생성 및 DOM생성
+  function printList(replyList){
+    let str ='';
+
+    // 댓글이 1개 이상이면 처리
+    if (replyList && replyList.length > 0 ){
+      for (const dto of replyList){
+        str +=
+        `
+          <li class="list-group-item d-flex replyItem">
+          <span class="col-2">${dto.rno}</span>
+          <span class="col-6" data-rno="${dto.rno}">${dto.replyText}</span>
+          <span class="col-2">${dto.replyer}</span>
+          <span class="col-2">${dto.regDate}</span>
+          </li>
+        `
+      }// end for
+    }// end for
+    //console.log("list:", str);
+    replyBnoList.innerHTML = str;
+  }
+
+  // 2. 게시글에 대한 댓글 서버에 요청해서 data 받아오기
+  function printReplies(page, size, goLast){
+
+    // 비동기 처리함수 호출
+    getList({bno, page, size, goLast})
+          .then( data => {
+            //console.log(data.dtoList);
+
+            printList(data.dtoList);// 댓글 목록 처리하는 함수 호출
+            printPages(data);   // 페이징 처리할 함수 호출
+
+          })
+          .catch(e => {console.log(e)})
+  }
+
+  // 1.  게시글에 대한 댓글 요청하는 함수 실행(호출)
+  let page = 1; // 현재 페이지 번호
+  let size = 5; // 페이지해당 되는 레코드(행)의 개수
+  printReplies(page,size,true);
+
+
+
+  // 5. 댓글 등록 모달
+  // 6. 이벤트 처리
+
+  // 6-1. 페이지 번호 클릭
+  replyPaging.addEventListener('click', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+
+    const target = e.target;
+    if (!target || target.tagName != 'A'){
+      return;
+    }
+
+    // <a>태그일 경우만 처리
+    // 현재 클릭한 태그 요소의 페이지 번호 추출0
+    const pageNum = target.getAttribute("data-page");
+    page = pageNum;
+    printReplies(page, size)
+
+  });
 
 
 
@@ -175,9 +276,7 @@
 
 
 
-  //서버로 부터 응답받은 메시지: db처리한 후 결과 값 전송한 객체
-  const result = [[${result}]]
-  const bno = [[${bno}]]
+
 
 
 

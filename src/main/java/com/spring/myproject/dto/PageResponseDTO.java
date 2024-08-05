@@ -19,7 +19,9 @@ public class PageResponseDTO<E> {
   private boolean prev; // 이전 페이지 존재 여부
   private boolean next; // 다음 페이지 존재 여부
 
-  private List<E> dtoList;// 해당페이지에 해당되는 게시글을 db로부터 읽어와서 저장한 객체
+  private List<E> dtoList;// 해당
+
+  // 페이지에 해당되는 게시글을 db로부터 읽어와서 저장한 객체
 
 
   // 생성자 : 페이징 초기화 설정
@@ -43,6 +45,7 @@ public class PageResponseDTO<E> {
     // Math.ceil(숫자) : 자리올림/10.0))*10;
     this.end = (int) (Math.ceil(this.page / 10.0)) * 10;  // 1블럭: 10, 2블럭: 20,...
     this.start = this.end - 9;            // 1블럭: 1 , 2블럭: 11,...
+
 
     // 총페이지수 = 총레코드수/10 = 결과값에 대한 자리올림
     // 1024/10 => 102.4 => 103 page로 계산

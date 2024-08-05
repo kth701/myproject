@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,14 +27,16 @@ class ReplyRepositoryTest {
 
   @Autowired
   private ReplyRepository replyRepository;
+
   @Autowired
   private BoardRepository boardRepository;
 
   @Test@DisplayName("Reply객체 생성하기")
   public void testInsertReply(){
 
+    /* 1. 댓글 생성 하기 */
     // 특정 게시글 가져오기
-    Long bno = 2L;
+    Long bno = 100L;
 
 //    Optional<Board> result = boardRepository.findById(bno);
 //    Board board = result.orElseThrow();
@@ -41,7 +44,7 @@ class ReplyRepositoryTest {
     Board board = boardRepository.findById(bno).orElseThrow();
     log.info("=> findById(n):"+board);
 
-    for (int i=1; i<=6; i++) {
+    for (int i=100; i<=201; i++) {
       // 특정 게시글에 대한 댓글 생성(특정 게시글과 댓글과 연관관계 설정후 생성)
       Reply reply = Reply.builder()
           // board_bno필드만 생성하여 board의 pk필드 bno값을 설정하고 join상태 설정
@@ -52,7 +55,30 @@ class ReplyRepositoryTest {
 
       // db처리
       replyRepository.save(reply);
-    }
+    }//end for
+
+    /*
+    // 2. 댓글 300개 생성하기
+    IntStream.rangeClosed(1, 300).forEach(i -> {
+
+      // 게시글 번호 무작위 선정
+      long bno = (long) (Math.random()*100)+1;
+      Board board = Board.builder().bno(bno).build();
+
+      // 특정 게시글에 대한 댓글 생성(특정 게시글과 댓글과 연관관계 설정후 생성)
+      Reply reply = Reply.builder()
+          // board_bno필드만 생성하여 board의 pk필드 bno값을 설정하고 join상태 설정
+          .board(board)   //=> .board_bno(board.getBno())
+          .replyText("댓글..."+i)
+          .replyer("replyer")
+          .build();
+
+      // db처리
+      replyRepository.save(reply);
+
+    });
+
+     */
 
 
   }
