@@ -69,10 +69,10 @@ public class ReplyController {
   //@Parameter(name = "replyDTO", description = "@Valid어노테이션으로 replyDTO 유효성 검사")
   // ---------------------------------------------------------------------------------- //
 
-  // 1. 댓글 등록
+  // 1. 댓글 등록 : url => /replies/
   @Operation(summary="Replies POST", description="POST방식으로 댓글 등록")
   @PostMapping(value="/",consumes = MediaType.APPLICATION_JSON_VALUE )// 전송받은 data 종류 명시
-  public Map<String, Long> register(
+  public Map<String, String> register(
                     @Valid @RequestBody ReplyDTO replyDTO,
                     BindingResult bindingResult // 객체값 검증
                     ) throws BindException {
@@ -88,7 +88,9 @@ public class ReplyController {
 
 
     Long rno = replyService.register(replyDTO);
-    Map<String, Long> resultMap = Map.of("rno", rno);
+
+    Map<String, String> resultMap = new HashMap<>();
+    resultMap.put("rno", rno+"번 댓글 등록되었습니다.");
 
     return resultMap;
   }
@@ -146,6 +148,14 @@ public class ReplyController {
     return resultMap;
   }
 
+  // 5. 댓글 조회
+  @Operation(summary="Read Reply", description="GET방식으로 특정 댓글 조회")
+  @GetMapping(value="/{rno}" )// 전송받은 data 종류 명시
+  public ReplyDTO getReplyDTO(@PathVariable("rno") Long rno){
+
+    ReplyDTO replyDTO = replyService.read(rno);
+    return replyDTO;
+  }
 
 
 }

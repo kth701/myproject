@@ -46,7 +46,17 @@ console.log("/js/reply.js.....")
 // ------------------------------------------------------------  //
 // 2.게시글에 대한 댓글 등록
 // ------------------------------------------------------------  //
-async function addReply(replObj){
+async function addReply(replyObj){
   const response = await axios.post(`/replies/`, replyObj);
+
+   console.log("addReply response:", response.data);
+  return response.data
+}
+// ------------------------------------------------------------  //
+// 3.게시글에 대한 댓글 조회
+// ------------------------------------------------------------  //
+async function getReply(rno){
+  const response = await axios.get(`/replies/${rno}`);
+  //console.log("addReply response:", response.data);
   return response.data
 }

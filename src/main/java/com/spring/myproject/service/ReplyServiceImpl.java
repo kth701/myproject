@@ -55,7 +55,7 @@ public class ReplyServiceImpl implements ReplyService {
     Reply reply = replyOptional.orElseThrow();
 
     //return modelMapper.map(reply, ReplyDTO.class);
-    return entityToDTO(reply);
+    return entityToDTO(reply); // entity -> dto전환후 반환
   }
   // 3. 댓글 수정 구현
   @Override
