@@ -86,6 +86,7 @@
 
     </div>
   <!-- --------------------------------------------------------------------  -->
+
   <!-- 댓글 list view -->
   <div class="row mt-3">
     <div class="col-md-12">
@@ -99,6 +100,7 @@
       </div>
     </div>
   </div>
+
   <!-- 댓글 페이징 -->
   <div class="row mt-3">
     <div class="col">
@@ -113,7 +115,37 @@
 
   <!-- --------------------------------------------------------------------  -->
   <!-- Modal UI start-->
-  <div class="modal" tabindex="-1">
+
+  <!-- reply register modal -->
+  <div class="modal registerModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Regisger Reply</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="input-group mb-3">
+            <span class="input-group-text">Reply Text</span>
+            <input type="text" class="form-control replyText"/>
+          </div>
+          <div class="input-group mb-3">
+            <span class="input-group-text">Replyer</span>
+            <input type="text" class="form-control replyer"/>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary">Register</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<!--  end reply register modal-->
+
+
+  <!-- message modal -->
+  <div class="modal  messageModal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -131,7 +163,8 @@
       </div>
     </div>
   </div>
-  <!-- Modal UI  end-->
+  <!-- end message modal -->
+
   <!-- --------------------------------------------------------------------  -->
 
 
@@ -245,12 +278,15 @@
   // 1.  게시글에 대한 댓글 요청하는 함수 실행(호출)
   let page = 1; // 현재 페이지 번호
   let size = 5; // 페이지해당 되는 레코드(행)의 개수
-  printReplies(page,size,true);
+  printReplies(page,size,true);// 현재 페이지번호, 페이지 사이즈, 마지막 페이지 사용여부
 
 
 
   // 5. 댓글 등록 모달
+
+  // ----------------- //
   // 6. 이벤트 처리
+  // ----------------- //
 
   // 6-1. 페이지 번호 클릭
   replyPaging.addEventListener('click', function(e){
@@ -280,10 +316,18 @@
 
 
 
+  //  댓글 등록 모달창
+  const registerModal = new bootstrap.Modal(document.querySelector('.registerModal'));
+  document.querySelector('.addReplyBtn')
+          .addEventListener('click', function(e){  // addReply 버튼 클릭을 처리하는 이벤트 핸들러
+
+    registerModal.show()
+  });
+
 
 
   // show modal창에 메시지 출력하기
-  const modal = new bootstrap.Modal(document.querySelector('.modal'));
+  const message_show = new bootstrap.Modal(document.querySelector('.messageModal'));
 
   let message = "";
   if (result) { // 응답이 있을 경우만 처리
@@ -296,7 +340,7 @@
         modal_message.innerHTML = message;
 
         // 모달 창 표시
-        modal.show();
+        message_show.show();
     }
   }
 

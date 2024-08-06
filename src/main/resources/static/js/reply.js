@@ -14,8 +14,9 @@ console.log("/js/reply.js.....")
   return result.data;
 }
 
-// ------------------------------------------------------ //
+// ------------------------------------------------------------  //
 // 1.게시글에 대한 댓글 List, 인자값이 여러개 전달 받을 경우=> {데이터1,..}
+// ------------------------------------------------------------  //
  async function getList({bno, page, size, goLast}){
   const result = await axios.get(
                                   `/replies/list/${bno}`,
@@ -29,7 +30,7 @@ console.log("/js/reply.js.....")
 //  console.log("total:"+total)
 //  console.log("lastPage:"+lastPage)
 
-  if (goLast) {// treu이면 가장 최근글 있는 페이지번호를 재요청
+  if (goLast) {// treu이면 가장 최근글 있는 페이지(막지막) 번호 재요청
     // 댓글 총 개수
     const total = result.data.total;
     // 댓글 마지막 페이지 계산 = 댓글 총개수/페이지 사이즈 => 자리올림
@@ -40,4 +41,12 @@ console.log("/js/reply.js.....")
   }
 
   return result.data;
+}
+
+// ------------------------------------------------------------  //
+// 2.게시글에 대한 댓글 등록
+// ------------------------------------------------------------  //
+async function addReply(replObj){
+  const response = await axios.post(`/replies/`, replyObj);
+  return response.data
 }

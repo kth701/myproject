@@ -47,6 +47,7 @@ public class PageResponseDTO<E> {
     this.start = this.end - 9;            // 1블럭: 1 , 2블럭: 11,...
 
 
+
     // 총페이지수 = 총레코드수/10 = 결과값에 대한 자리올림
     // 1024/10 => 102.4 => 103 page로 계산
     int last = (int) Math.ceil(total / (double) size);
