@@ -60,3 +60,20 @@ async function getReply(rno){
   //console.log("addReply response:", response.data);
   return response.data
 }
+
+// ------------------------------------------------------------  //
+// 4.게시글에 대한 댓글 수정
+// ------------------------------------------------------------  //
+async function modifyReply(replyObj){
+  const response = await axios.put(`/replies/${replyObj.rno}`, replyObj);
+  //console.log("addReply response:", response.data);
+  return response.data
+}
+// ------------------------------------------------------------  //
+// 5.게시글에 대한 댓글 삭제
+// ------------------------------------------------------------  //
+async function removeReply(rno){
+  const response = await axios.delete(`/replies/${rno}`);
+  //console.log("addReply response:", response.data);
+  return response.data
+}
