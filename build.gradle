@@ -55,6 +55,9 @@ dependencies {
 
 	// springboot 3.xx 이후 : springfox-swagger-ui: REST API테스트 라이브러리
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+	// net.coobird/thumbnailator
+	implementation 'net.coobird:thumbnailator:0.4.20'
+
 
 
 
