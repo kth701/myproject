@@ -199,9 +199,6 @@
 
 
 
-
-
-
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
 <style layout:fragment="mystyle" th:inline="css">
   .mylink {
@@ -209,6 +206,8 @@
   }
 
 </style>
+
+
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
 <script layout:fragment="myscript" th:inline="javascript">
@@ -236,10 +235,12 @@
   */
 
 
+  //------------------------------------------------------------------------ //
   const replyBnoList = document.querySelector('.replyList'); // 댓글 목록 DOM
   const replyPaging = document.querySelector('.replyPaging');// 페이지 목록 DOM
-
+  //------------------------------------------------------------------------ //
   // 4. 페이징 처리
+  //------------------------------------------------------------------------ //
   function printPages(data){
     console.log("paging:", data);
 
@@ -263,8 +264,9 @@
     replyPaging.innerHTML = pageStr;
 
   }
-
+  //----------------------------------------------------------------- //
   // 3. 서버로 부터 받아온 댓글을 DOM을 구성할 수 있는 문자열 생성 및 DOM생성
+  //----------------------------------------------------------------- //
   function printList(replyList){
     let str ='';
 
@@ -311,11 +313,12 @@
 
 
 
-  // ----------------- //
-  // 5. 이벤트 처리
-  // ----------------- //
 
+  // 5. 이벤트 처리
+
+  //--------------------------------------------- //
   // 5-1. 페이지 번호 클릭
+  //--------------------------------------------- //
   replyPaging.addEventListener('click', function(e){
     e.preventDefault();
     e.stopPropagation();
@@ -334,9 +337,9 @@
 
   });
 
-
-
+  //--------------------------------------------- //
   // 5-2 댓글 등록 모달창
+  //--------------------------------------------- //
   const registerModal = new bootstrap.Modal(document.querySelector('.registerModal'));
 
   const registerBtn =  document.querySelector('.registerBtn');
@@ -385,7 +388,9 @@
     registerModal.hide()
   });
 
+  //--------------------------------------------- //
   // 5-3. 댓글 조회 및 수정
+  //--------------------------------------------- //
   const modifyModal = new bootstrap.Modal(document.querySelector('.modifyModal'));
   const replyList = document.querySelector('.replyList');
 
@@ -398,8 +403,8 @@
 
   replyList.addEventListener('click', function(e){
     e.stopPropagation();
+    // console.log(e)
 
-    console.log(e)
     const target = e.target;
     if (!target || target.tagName != 'SPAN'){
       return;
@@ -419,7 +424,7 @@
         .then(reply => {
           console.log(reply);
 
-          replyHeader.innerHTML = reply.rno+"번 댓글";
+          replyHeader.innerHTML = reply.rno;
           modifyText.value = reply.replyText;
           modifyModal.show();  // modify 모달창 표시
         })
@@ -428,9 +433,65 @@
 
   });
 
+  modifyBtn.addEventListener('click', function(e){
+    console.log('modify')
+
+    const replyObj = {
+      bno: bno,                       // 댓글에 대한 게시글번호
+      rno: replyHeader.innerHTML,     // 댓글 번호
+      replyText: modifyText.value     // 댓글 내용
+    }
+
+    // 비동기 처리 요청
+    modifyReply(replyObj)
+            .then(result => {
+              alert(result.rno+' 댓글이 수정되었습니다.');
+
+              replyText.value = ''
+              modifyModal.hide()
+
+              //첫 페이지부터 댓글 List 조회
+              //page = 1;
+              //printReplies(page, size)
+              printReplies(page, size, true) // 댓글 List조회 마지막 페이지 설정 여부(true)
+            })
+            .catch(e =>  console.log(e));
+
+  });
+  removeBtn.addEventListener('click', function(e){
+    console.log('remove')
+
+    let isOK = confirm('삭제 하시겠습니까?')
+    console.log('remove isOK:', isOK);
+
+     if (!isOK) return;
+
+     // 삭제여부 버튼 true(확인)이면 처리
+     let rno = replyHeader.innerHTML;
+     removeReply(rno)
+            .then(result => {
+              alert(result.rno+' 댓글이 삭제되었습니다.');
+
+              replyText.value = ''
+              modifyModal.hide()
+
+              //첫 페이지부터 댓글 List 조회
+              //page = 1;
+              //printReplies(page, size)
+
+              printReplies(page, size, true) // 댓글 List조회 마지막 페이지 설정 여부(true)
+            })
+            .catch(e =>  console.log(e));
+
+  });
+  closeModifyBtn.addEventListener('click', function(e){
+    modifyModal.hide();
+  });
 
 
-  // show modal창에 메시지 출력하기
+  //--------------------------------------------- //
+  // response message show modal창에 메시지 출력하기
+  //-------------------------------------------- //
   const message_show = new bootstrap.Modal(document.querySelector('.messageModal'));
 
   let message = "";
