@@ -22,10 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @Log4j2
@@ -119,11 +116,35 @@ public class UpDownController {
     return ResponseEntity.ok().headers(headers).body(resource);
   }
 
-  // file remove
+  // file remove:  첨부파일 삭제
   @Operation(summary="remove 파일", description="DELETE방식으로 첨부파일 삭제")
   @GetMapping(value="/remove/{fileName}")
   public Map<String, Boolean> removeFile(@PathVariable String fileName){
-    return null;
+
+    Resource resource = new FileSystemResource(uploadPath+File.separator+fileName);
+    // "C:\\javaStudy\\upload" + "\\" + "a.jpg"
+    String resourceName = resource.getFilename();
+
+    Map<String, Boolean> resultMap = new HashMap<>();
+    boolean removed = false;
+
+    try {
+      String contentType = Files.probeContentType(resource.getFile().toPath());
+      removed = resource.getFile().delete();
+
+      // 섬네일이 존재하면
+       log.info("=> contentType: "+ contentType);
+      if (contentType.startsWith("image")){
+        File thumbnailFile = new File(uploadPath+File.separator+"s_"+fileName);
+        thumbnailFile.delete();
+      }
+
+    } catch(Exception e){
+      log.error(e.getMessage());
+    }
+
+    resultMap.put("result", removed);
+    return resultMap;
   }
 
 }
