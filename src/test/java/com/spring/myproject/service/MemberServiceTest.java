@@ -24,6 +24,7 @@ class MemberServiceTest {
 
   // 회원 정보 DTO, Entity생성하기
   public Member createMember(){
+    // 클라이언트로부터 전달받은
     // 더미 data MemberDTO 생성
     MemberDTO memberDTO = MemberDTO.builder()
         .email("test@email.com")
@@ -32,8 +33,15 @@ class MemberServiceTest {
         .password("1234")
         .build();
 
+    //----------------------------------//
     // dto -> 암호화 작업 -> entity
-    return Member.createMember(memberDTO, passwordEncoder);
+    //----------------------------------//
+
+    // 1. dto->entity : Member클래스 createMember메서드 활용
+    //return Member.createMember(memberDTO, passwordEncoder);
+
+    // 2. dto->entity :인터페이스에서 정의한 메서드 활용
+    return memberService.dtoToEntity(memberDTO, passwordEncoder);
   }
 
   @Test
@@ -51,8 +59,6 @@ class MemberServiceTest {
     assertEquals(member.getPassword(),  savedMember.getPassword());
     assertEquals(member.getRole(),      savedMember.getRole());
 
-
-
   }
 
   @Test
@@ -64,9 +70,12 @@ class MemberServiceTest {
     // 회원2
     Member member2 = createMember();
 
-    Throwable e = assertThrows(IllegalStateException.class, () ->{
-      memberService.saveMember(member2);
-    });
+    Throwable e = assertThrows(
+        IllegalStateException.class, () ->{  memberService.saveMember(member2); }
+    );
+
+    // 예외 발생 메시지 동일 여부 확인
+    assertEquals("이미 가입된 회원 입니다.",      e.getMessage());
 
   }
 

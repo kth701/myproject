@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/basic}"    >
+
+
+<!-- 현재 페이지에서만 사용하는 컨텐츠(내용) 정의 -->
+<div layout:fragment="content" class="p-4">
+  <h2>MemberController에서 생성한 memberDTO: <br>[[${memberDTO}]]</h2>
+  <hr>
+
+
+  <div>
+    <form  id="memberForm" action="/members/new" method="post"
+           th:Object="${memberDTO}">
+
+      <!-- memberDTO.email -->
+      <div class="row align-items-end mb-3">
+
+        <div class="col-10">
+            <label for="email" 	class="form-label">Email</label>
+            <input type="text" 	class="form-control"
+                 id="email" placeholder="이메일을 입력해주세요"
+                 th:field="*{email}">
+        </div>
+
+        <div class="col-2">
+          <!-- 중복 체크 -->
+          <input type="button" id="idCheck" class="btn btn-info btn-sm"  value="ID Check" />
+        </div>
+
+        <!-- 서버에서 필드에 대한 유효성 검사후 에러 메세지 처리하는 div -->
+        <div class="col-12">
+
+          <div if="${#fields.hasErrors('email')}" th:errors="*{email}" class="fieldError"></div>
+          <div id="emailCheck" 	class="fieldError"></div>
+        </div>
+      </div>
+
+      <!-- memberDTO.password -->
+      <div class="mb-3">
+        <label for="pwd" class="form-label">Password</label>
+        <input type="password" class="form-control" id="pwd"  placeholder="비밀번호 입력"
+               th:field="*{password}">
+
+        <!-- 서버에서 필드에 대한 유효성 검사후 에러 메세지 처리하는 div -->
+        <div if="${#fields.hasErrors('password')}" th:errors="*{password}" class="fieldError"></div>
+      </div>
+      <!-- memberDTO.name -->
+      <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="name" placeholder="이름을 입력하세요."
+               th:field="*{name}">
+
+        <div if="${#fields.hasErrors('name')}" th:errors="*{name}" class="fieldError"></div>
+      </div>
+      <!--memberDTO.address -->
+      <div class="mb-3">
+        <label for="address" class="form-label">Address</label>
+        <input type="text" class="form-control" id="address" placeholder="주소를 입력하세요."
+               th:field="*{address}">
+
+        <div if="${#fields.hasErrors('name')}" th:errors="*{name}" class="fieldError"></div>
+      </div>
+
+      <div>
+        <button type="submit" class="btn btn-primary" >가입하기</button>
+        <button type="reset" class="btn btn-secondary" >초기화</button>
+      </div>
+      <!-- CSRF토큰: Cross-site Request Forgery(크로스 사이트간 요청 위조)
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
+    </form>
+  </div>
+
+
+
+</div>
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<style layout:fragment="mystyle" th:inline="css">
+  .fieldError{
+    color: red;
+    font-size: 0.8em;
+
+    padding: 0.2em;
+    padding-left: 1em;
+    padding-right: 1em;
+
+  }
+</style>
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<script layout:fragment="myscript" th:inline="javascript">
+  var email_Check = document.querySelector('#emailCheck')
+  var errorMessage = [[${errorMessage}]]// 서버에서 전송한 에러 메시지
+
+  if (errorMessage) {// 에러 메시지가 있으면 들여쓰기와 메시지 출력
+    email_Check.innerHTML = errorMessage
+    console.log("errorMessage:",errorMessage);
+  }
+
+</script>
+
+</html>

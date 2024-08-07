@@ -16,9 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface MemberService {
 
-  public Member saveMember(Member member);
+  public Member saveMember(MemberDTO memberDTO);
 
-  // dtoToEntity : MemberDTO -> 암호화 -> Entity
+  // 1. 방법 : dtoToEntity : MemberDTO -> 암호화 -> Entity
   default Member dtoToEntity(MemberDTO memberDTO,  PasswordEncoder passwordEncoder){
     Member member = new Member();
 

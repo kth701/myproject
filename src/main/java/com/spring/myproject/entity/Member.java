@@ -16,12 +16,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class Member {
   @Id
   @Column(name="member_id")
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   private String name;
 
-  @Column(unique = true)  // 회원은 이메일에 동일한 값이 허용할 수 없도록 설정
+  @Column(unique = true)  // 회원은 이메일에 동일`한 값이 허용할 수 없도록 설정
   private String email;
   private String password;
   private String address;
@@ -29,7 +29,7 @@ public class Member {
   private Role role;
 
 
-  // createMember():  dto -> entity
+  // 1.방법 : createMember():  dto -> entity
   public static Member createMember(MemberDTO memberDTO,
                                     PasswordEncoder passwordEncoder){
     Member member = new Member();
