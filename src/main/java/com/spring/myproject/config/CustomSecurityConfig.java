@@ -16,16 +16,16 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @Log4j2@RequiredArgsConstructor
 public class CustomSecurityConfig {
-//  @Bean
-//  public BCryptPasswordEncoder passwordEncoder(){
-//    return new BCryptPasswordEncoder();
-//  }
+  @Bean
+  public BCryptPasswordEncoder passwordEncoder(){
+    return new BCryptPasswordEncoder();
+  }
 
 
-  // SecurityFilterChain의 filterChain()
-  // 모든 사용작 모든 경로에 접근할 수 있게 설정
+
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    // SecurityFilterChain의 filterChain(): 모든 사용자가 모든 경로에 접근할 수 있게 설정
     log.info("=> SecurityFilterChain() 호출");
 
     // 1. CSRF요청 비활성화: 개발테스트 비활성화
