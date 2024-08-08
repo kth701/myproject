@@ -21,8 +21,13 @@
         <input type="password" class="form-control"
                name="password"
                id="password" placeholder="비밀버호를 입력">
+        <div>
+          <!-- 로그인 실패시 서버에 전송 에러 메시지 출력 -->
+          <p th:if="${loginErrorMsg}" class="fieldError"
+             th:text="${loginErrorMsg}">Incorrect data</p>
+        </div>
       </div>
-      <p th:if="${loginErrorMsg}" class="fieldError" th:text="${loginErrorMsg}">Incorrect data</p>
+
 
       <div class="mb-3 ">
         <input type="checkbox" class="form-checkbox"
@@ -45,7 +50,15 @@
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
 <style layout:fragment="mystyle" th:inline="css">
+  .fieldError{
+    color: red;
+    font-size: 0.8em;
 
+    padding: 0.2em;
+    padding-left: 1em;
+    padding-right: 1em;
+
+  }
 </style>
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->

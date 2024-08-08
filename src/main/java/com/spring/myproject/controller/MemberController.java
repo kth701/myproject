@@ -65,6 +65,16 @@ public class MemberController {
 
     return "/members/loginForm";
   }
+  // 로그인 실패시 처리할 url
+  @GetMapping("/login/error")
+  public String loginError(Model model){
+    log.info("==> login error");
+
+    model.addAttribute("loginErrorMsg", "아이디 또는 비밀번호 확인해주세요.");
+    return "/members/loginForm";
+
+  }
+
   // 로그아웃 처리
 
 }

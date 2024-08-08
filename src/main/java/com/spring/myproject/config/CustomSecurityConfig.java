@@ -1,6 +1,9 @@
 package com.spring.myproject.config;
 
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -11,8 +14,15 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -38,17 +48,42 @@ public class CustomSecurityConfig {
     // 2.1 로그인 관련 설정 => UserDetailsSeervice인터페이스 구현 후 설정 할 것
     http.csrf(AbstractHttpConfigurer::disable)
         .formLogin(login -> {
-                    login.loginPage("/members/login")   // 로그인 처리할 url 설정
-                        .defaultSuccessUrl("/")     // 로그인 성공시 url 설정
-                        .usernameParameter("email") // 로그인 성공시 가져올  data 매개변수
-                        .passwordParameter("password")  // 로그인 성공시 가져올 data매개변수
-                        .failureUrl("/board/list")  ;  // 로그인 실패시 url 설정
+                    login.loginPage("/members/login")             // 로그인 처리할 url 설정
+                        .defaultSuccessUrl("/")                   // 로그인 성공시 url 설정
+                        .usernameParameter("email")               // 웹의 username의  매개변수이름 설정
+                        .passwordParameter("password")            // 웹의 password의  매개변수이름 설정
+                        //.loginProcessingUrl("/members/login")   // 웹 로그인창의 form action값 설정
+                        .failureUrl("/members/login/error")               // 로그인 실패시 url 설정
+
+                        // 성공 또는 실패할 경우 핸들러 사용해서 원하는 것을 실행 할 경우 적용
+                        // defaultSuccessUrl(),failureUrl() 중복될 경우 핸들러가 우선으로 수행됨.
+                        .successHandler(new AuthenticationSuccessHandler() {
+                          @Override
+                          public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+                            log.info("==> authentication: "+authentication.getName());
+                            response.sendRedirect("/");
+                          }
+                        })
+                        .failureHandler(new AuthenticationFailureHandler(){
+                          @Override
+                          public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+                            log.info("==> exception: " + exception.getMessage());
+                            response.sendRedirect("/members/login/error");
+                            }
+                          });
                     });
 
     // SpringBoot 3v 변경된 코드 확인 authorizeRequests() → authorizeHttpRequests()
     //http.authorizeRequests().anyRequest().authenticated(); -> http.authorizeHttpRequests().anyRequest().authenticated();
 
     // 3. 로그아웃 관련 설정
+    // 로그아웃을 기본으로 설정 => url : "/logout" 로그아웃 수행
+    //http.logout(Customizer.withDefaults());
+    http.logout(logout -> {
+      logout.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+          .logoutSuccessUrl("/board/list")
+          .invalidateHttpSession(true);
+    });
 
     return http.build();
 
