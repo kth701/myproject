@@ -60,6 +60,8 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 	// net.coobird/thumbnailator
 	implementation 'net.coobird:thumbnailator:0.4.20'
+	// CSRF토큰:
+	//implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.2.RELEASE'
 
 
 	// spring-boot-devtools

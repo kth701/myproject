@@ -3,18 +3,10 @@ package com.spring.myproject.service;
 
 import com.spring.myproject.constant.Role;
 import com.spring.myproject.dto.MemberDTO;
-import com.spring.myproject.dto.ReplyDTO;
-import com.spring.myproject.entity.Board;
 import com.spring.myproject.entity.Member;
-import com.spring.myproject.entity.Reply;
-import com.spring.myproject.repository.MemberRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-
-public interface MemberService {
+public interface MemberService  {
 
   public Member saveMember(MemberDTO memberDTO);
 

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/basic}"    >
+
+
+<!-- 현재 페이지에서만 사용하는 컨텐츠(내용) 정의 -->
+<div layout:fragment="content" class="p-4">
+  <h2>Login</h2>
+  <hr>
+  <div class="m-3 p-4">
+    <form action="/members/login" method="post" id="loginForm">
+      <div class="mb-3">
+        <label for="email" class="form-label">Email address</label>
+        <input type="text" class="form-control"
+               name="email"
+               id="email" placeholder="이메일을 입력">
+      </div>
+      <div class="mb-3 ">
+        <label for="password" class="col-sm-2 col-form-label">Password</label>
+        <input type="password" class="form-control"
+               name="password"
+               id="password" placeholder="비밀버호를 입력">
+      </div>
+      <p th:if="${loginErrorMsg}" class="fieldError" th:text="${loginErrorMsg}">Incorrect data</p>
+
+      <div class="mb-3 ">
+        <input type="checkbox" class="form-checkbox"
+               name="remember-me" id="auto"></input>
+        <label for="auto">Remember me</label>
+      </div>
+      <div class="mb-3 ">
+        <button type="submit" class="btn btn-primary ">Login</button>
+        <button type="button" class="btn btn-secondary"
+                onclick="location.href='members/new'">회원가입</button>
+      </div>
+      <!--
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+      -->
+    </form>
+  </div>
+
+
+</div>
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<style layout:fragment="mystyle" th:inline="css">
+
+</style>
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<script layout:fragment="myscript" th:inline="javascript">
+
+</script>
+
+</html>
