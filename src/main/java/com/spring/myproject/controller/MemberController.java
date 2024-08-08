@@ -58,14 +58,19 @@ public class MemberController {
     return "redirect:/";
   }
 
-  // 로그인 처리
+
+
+  //----------------------- //
+  // 로그인, 로그아웃 처리
+  //----------------------- //
+  // 1. 로그인
   @GetMapping(value="/login")
   public String loginMember(String error, String logout){
     log.info("=> login ");
 
     return "/members/loginForm";
   }
-  // 로그인 실패시 처리할 url
+  // 1-1. 로그인 실패시 처리할 url
   @GetMapping("/login/error")
   public String loginError(Model model){
     log.info("==> login error");

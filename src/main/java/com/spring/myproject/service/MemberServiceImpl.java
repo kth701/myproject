@@ -58,10 +58,26 @@ public class MemberServiceImpl implements  MemberService {
     log.info("=> loadUserByUsername: "+ username);
 
     // 더미 User객체 생성하기
+    /*
     UserDetails userDetails = User.builder()
         .username("user1@test.com")
         .password(passwordEncoder.encode("1234")) // 패스워드 인코드 필요
         .authorities(Role.USER.toString())
+        .build();
+    */
+
+   /*
+    // Member Entity(DB)에 있는 정보를 기준으로 Authentication 처리
+    Member member = memberRepository.findByEmail(username);
+
+    if (member == null){ // 미가입 회원일 경우
+      throw new UsernameNotFoundException(username);
+    }
+
+    UserDetails userDetails = User.builder()
+        .username(member.getEmail())
+        .password(member.getPassword())
+        .authorities(member.getRole().toString())
         .build();
 
     return userDetails;
