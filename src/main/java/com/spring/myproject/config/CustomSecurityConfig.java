@@ -89,17 +89,6 @@ public class CustomSecurityConfig {
     return http.build();
   }
 
-//  @Bean
-//  public void configureGlobal(AuthenticationManagerBuilder auth)
-//      throws Exception {
-//    auth
-//        .inMemoryAuthentication()
-//        .withUser("user").password(passwordEncoder().encode("password")).roles("USER")
-//        .and()
-//        .withUser("admin").password(passwordEncoder().encode("admin")).roles("ADMIN");
-//  }
-
-
 }
 
 /*
