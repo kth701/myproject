@@ -36,12 +36,14 @@
             <a class="nav-link active" aria-current="page"
                href="/" th:href="@{/}">Home</a>
           </li>
-<!--          sec:authorize="hasAnyAuthority('ROLE_USER')"-->
-          <li class="nav-item" sec:authorize="hasAnyAuthority('ADMIN')" >
+          <!-- sec:authoize 속성을 통해 특정 요소(태그)를 활성화, 비활성화 설정
+               sec:authorize="hasAnyAuthority('ROLE_USER')" 변경전
+               sec:authorize="hasAnyAuthority('USER')"  변경후 -->
+          <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')" >
             <a class="nav-link" href="/admin/item/new"
                                 th:href="@{/admin/item/new}">상품등록</a>
           </li>
-          <li class="nav-item" sec:authorize="hasAnyAuthority('ADMIN')" >
+          <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')" >
             <a class="nav-link" href="/admin/items"
                                 th:href="@{/admin/items}">상품관리</a>
           </li>

@@ -22,7 +22,8 @@ public interface MemberService  {
     String password = passwordEncoder.encode(memberDTO.getPassword());
     member.setPassword(password);
     //member.setRole(Role.USER);
-    member.setRole(Role.ADMIN);
+    //member.setRole(Role.ADMIN);
+    member.addRole(memberDTO.getRole());
 
     return member;
   }

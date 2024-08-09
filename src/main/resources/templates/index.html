@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
@@ -96,26 +97,37 @@
         </div>
       </div>
     </nav>
+
+
     <!-- Page content-->
     <div class="container-fluid">
       <h1 class="mt-4">Thymeleaf Template Simple Sidebar</h1>
-      <h3 class="mt-4">Thymeleaf Template</h3>
-      <p>The starting state of the menu will appear collapsed on smaller screens, and will appear non-collapsed on larger screens. When toggled using the button below, the menu will change.</p>
-      <p>
-        Make sure to keep all page content within the
-        <code>#page-content-wrapper</code>
-        . The top navbar is optional, and just for demonstration. Just create an element with the
-        <code>#sidebarToggle</code>
-        ID which will toggle the menu when clicked.
-      </p>
+      <hr>
+
+      <!-- ----------------------------------------------------------
+      <h1>로그인 작업후 authentication 정보 </h1>
+      <div sec:authorize="isAuthenticated()">
+        <h2>스프링 시큐리티를 사용하는 경우 Authentication타입을 이용해서 사용자 정보를 추출</h2>
+        <h3>authentication 정보 추출</h3>
+        <div th:text="${#authentication}"></div>
+        <h3>authentication.principal 정보 추출</h3>
+        <div th:text="${#authentication.principal}"></div>
+        <h3>authentication.principal.authorities 정보 추출</h3>
+        <div th:text="${#authentication.principal.authorities}"></div>
+        <h3>authentication.principal.username 정보 추출</h3>
+        <div th:text="${#authentication.principal.username}"></div>
+        <h3>authentication.principal.passowrd 정보 추출</h3>
+        <div th:text="${#authentication.principal.password}"></div>
+      </div>
     </div>
+
+    -->
+
   </div>
 
 
 </div>
 
-<!-- Page footer wrapper-->
-<div th:replace="~{fragments/footer::footer}">
 
 </div>
 
@@ -124,10 +136,23 @@
 
 
 <!-- Bootstrap core JS-->
-<script src="js/bootstrap.bundle.min.js"
-        th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script src="js/bootstrap.bundle.min.js" th:src="@{/js/bootstrap.bundle.min.js}"></script>
 <!-- Core theme JS-->
-<script src="js/scripts.js"
-        th:src="@{/js/scripts.js}"></script>
+<script src="js/scripts.js"  th:src="@{/js/scripts.js}"></script>
+
+
+<script  th:inline="javascript">
+  console.log("index.html");
+  // ---------------------------------------------------------------------- //
+  // 스프링 시큐리티를 사용하는 경우 Authentication타입을 이용해서 사용자 정보를 추출
+  // ---------------------------------------------------------------------- //
+  const auth = [[${#authentication}]]
+  console.log("authentication:",auth);
+  console.log("authentication.principal:",auth.principal);
+  console.log("authentication.principal.authorities:",auth.principal.authorities);
+  // ---------------------------------------------------------------------- //
+</script>
+
 </body>
+
 </html>

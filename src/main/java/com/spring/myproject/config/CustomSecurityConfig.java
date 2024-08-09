@@ -11,6 +11,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -28,6 +31,8 @@ import java.io.IOException;
 @Configuration
 @EnableWebSecurity
 @Log4j2@RequiredArgsConstructor
+// @EnableGlobalMethodSecurity ->  @EnableMethodSecurity
+@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true) // 어노테이션 권한 설정
 public class CustomSecurityConfig {
 
   @Bean
@@ -76,6 +81,18 @@ public class CustomSecurityConfig {
 
     // SpringBoot 3v 변경된 코드 확인 authorizeRequests() → authorizeHttpRequests()
     //http.authorizeRequests().anyRequest().authenticated(); -> http.authorizeHttpRequests().anyRequest().authenticated();
+//    http.authorizeHttpRequests( auth -> {
+//        auth.requestMatchers("/","/members/**").permitAll();
+//        auth.requestMatchers("/board/**").hasRole("ADMIN");
+//        auth.anyRequest().permitAll();
+//    });
+//    http
+//        .authorizeRequests()
+//        .requestMatchers("/","/css/**","/js/**","/members/**").permitAll()
+//        .requestMatchers("/board/list").hasRole("ADMIN")
+//        .requestMatchers("/admin/**").access("hasRole('ADMIN') or hasRole('SYS')")
+//        .anyRequest().authenticated();
+
 
     // 3. 로그아웃 관련 설정
     // 로그아웃을 기본으로 설정 => url : "/logout" 로그아웃 수행
@@ -85,6 +102,7 @@ public class CustomSecurityConfig {
           .logoutSuccessUrl("/board/list")
           .invalidateHttpSession(true);
     });
+
 
     return http.build();
   }
@@ -126,5 +144,15 @@ UserDetailsService인터페이스 : 인증을 처리하는 인터페이스 구�
                     // 로그아웃 기능 허용
                     .logout()
                     .permitAll();
+
+ */
+
+/* 어노테이션 권한 설정
+@EnableGlobalMethodSecurity(
+        securedEnabled = true,  // @Secured어노테이션 확성화 여부
+        prePostEnabled = true   // @PreAuthorized, @PostAuthorized 어노테이션 활성화 여부
+        )
+
+
 
  */

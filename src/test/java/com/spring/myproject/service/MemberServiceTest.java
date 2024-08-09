@@ -1,21 +1,26 @@
 package com.spring.myproject.service;
 
+import com.spring.myproject.constant.Role;
 import com.spring.myproject.dto.MemberDTO;
 import com.spring.myproject.entity.Member;
+import com.spring.myproject.repository.MemberRepository;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@Transactional
-@TestPropertySource(locations = {"classpath:application-test.properties"})
+@Transactional@Commit
+//@TestPropertySource(locations = {"classpath:application-test.properties"})
 @Log4j2
 class MemberServiceTest {
 
@@ -23,17 +28,35 @@ class MemberServiceTest {
   MemberService memberService;
   @Autowired
   PasswordEncoder passwordEncoder;
+  @Autowired
+  MemberRepository memberRepository;
 
   // 회원 정보 DTO, Entity생성하기
-  public MemberDTO createMember(){
+  @Test
+  @DisplayName("Member Entity 생성")
+  public void createMember2(){
     // 클라이언트로부터 전달받은
     // 더미 data MemberDTO 생성
-    MemberDTO memberDTO = MemberDTO.builder()
-        .email("test@email.com")
-        .name("홍길동")
-        .address("부산시 진구")
-        .password("1234")
-        .build();
+    IntStream.rangeClosed(1,100).forEach(i->{
+
+      Member member = Member.builder()
+          .email("test"+i+"@email.com")
+          .name("홍길동"+i)
+          .address("부산시 진구")
+          .password("1111")
+          .build();
+
+        member.addRole(Role.USER);
+
+      if (i>=90) {
+        member.addRole(Role.ADMIN);
+      }
+
+      Member savedMember = memberRepository.save(member);
+
+    });
+
+
 
     //----------------------------------//
     // dto -> 암호화 작업 -> entity
@@ -44,7 +67,12 @@ class MemberServiceTest {
 
     // 2. dto->entity :인터페이스에서 정의한 메서드 활용
     //return memberService.dtoToEntity(memberDTO, passwordEncoder);
-    return memberDTO;
+    //return null;
+  }
+
+
+  public MemberDTO createMember(){
+    return null;
   }
 
   @Test
@@ -68,7 +96,7 @@ class MemberServiceTest {
     assertEquals(member.getEmail(),     savedMember.getEmail());
     assertEquals(member.getAddress(),   savedMember.getAddress());
     assertEquals(member.getPassword(),  savedMember.getPassword());
-    assertEquals(member.getRole(),      savedMember.getRole());
+    assertEquals(member.getName(),      savedMember.getName());
 
   }
 

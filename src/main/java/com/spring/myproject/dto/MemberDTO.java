@@ -1,5 +1,6 @@
 package com.spring.myproject.dto;
 
+import com.spring.myproject.constant.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -21,4 +22,8 @@ public class MemberDTO {
   private String password;
   @NotEmpty(message = "주소는 필수 입력 값입니다.")
   private String address;
+
+  // Role data 임시 저장 용
+  private Role role;
+
 }
