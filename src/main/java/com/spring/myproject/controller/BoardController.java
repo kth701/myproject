@@ -9,6 +9,7 @@ import com.spring.myproject.service.BoardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -79,6 +80,7 @@ public class BoardController {
   }
 
   // 3. 게시글 조회 및 수정 화면 => /board/read or /baord/modify 요청 처리
+  @PreAuthorize("isAuthenticated()")
   @GetMapping({"/read", "/modify"})
   public void read(Long bno,
                    PageRequestDTO pageRequestDTO,
