@@ -28,7 +28,7 @@ public class RoleController {
   //
   //--------------------------- //
   // 권한이 ADMIN인경우 허용
-  @Secured(value={"ROLE_ADMIN","ROLE_ADMIN"}) // @Secured : 한개의 권한만 가능 (OR만가능)
+  @Secured(value={"ROLE_USER", "ROLE_ADMIN"}) // @Secured : 한개의 권한만 가능 (OR만가능)
   @GetMapping("/secured")
   public @ResponseBody String roleSe(){
     return "@Secured(value='ROLE_ADMIN')";

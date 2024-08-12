@@ -21,9 +21,12 @@ public interface MemberService  {
     // 비밀번호 -> 암화화 작업
     String password = passwordEncoder.encode(memberDTO.getPassword());
     member.setPassword(password);
+    // 1. 권한 설정이 1개일 경우
     //member.setRole(Role.USER);
     //member.setRole(Role.ADMIN);
-    member.addRole(memberDTO.getRole());
+
+    // 2. 권한 설정이 여러개 일 경우
+    member.addRole(Role.USER);
 
     return member;
   }

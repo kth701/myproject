@@ -18,10 +18,10 @@ public class AuthMemberDTO extends User {
   private String address;
 
   public AuthMemberDTO(
-      String address,
-      String username,
-      String password,
-      Collection<? extends GrantedAuthority> authorities ){
+            String address,
+            String username,
+            String password,
+            Collection<? extends GrantedAuthority> authorities ){
 
     super(username, password, authorities); // 부모 생성자 호출
 

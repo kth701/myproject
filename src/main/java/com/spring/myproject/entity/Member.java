@@ -56,7 +56,7 @@ public class Member {
 
 
 
-  // 1.방법 : createMember():  dto -> entity
+  // 1.엔티티 메서드 방법 : createMember():  dto -> entity
   public static Member createMember(MemberDTO memberDTO,
                                     PasswordEncoder passwordEncoder){
     Member member = new Member();

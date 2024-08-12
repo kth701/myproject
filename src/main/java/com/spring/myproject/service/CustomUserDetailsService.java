@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class CustomUserDetailsService implements UserDetailsService {
 
   private final MemberRepository memberRepository;
-  private final PasswordEncoder passwordEncoder;
+  //private final PasswordEncoder passwordEncoder;
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
