@@ -104,7 +104,7 @@
       <h1 class="mt-4">Thymeleaf Template Simple Sidebar</h1>
       <hr>
 
-      <!-- ----------------------------------------------------------
+      <!-- ----------------------------------------------------------  -->
       <h1>로그인 작업후 authentication 정보 </h1>
       <div sec:authorize="isAuthenticated()">
         <h2>스프링 시큐리티를 사용하는 경우 Authentication타입을 이용해서 사용자 정보를 추출</h2>
@@ -118,10 +118,13 @@
         <div th:text="${#authentication.principal.username}"></div>
         <h3>authentication.principal.passowrd 정보 추출</h3>
         <div th:text="${#authentication.principal.password}"></div>
+        <hr>
+        <h3>authentication.principal.address 정보 추출</h3>
+        <div th:text="${#authentication.principal.address}"></div>
       </div>
     </div>
 
-    -->
+
 
   </div>
 

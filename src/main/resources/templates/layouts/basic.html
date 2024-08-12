@@ -43,7 +43,7 @@
             <a class="nav-link" href="/admin/item/new"
                                 th:href="@{/admin/item/new}">상품등록</a>
           </li>
-          <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')" >
+          <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
             <a class="nav-link" href="/admin/items"
                                 th:href="@{/admin/items}">상품관리</a>
           </li>

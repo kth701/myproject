@@ -17,15 +17,19 @@ public class AuthMemberDTO extends User {
   //private String password; // 부모요소에 있는 password필드 그대로 사용
   private String address;
 
-  public AuthMemberDTO(
-            String address,
-            String username,
-            String password,
-            Collection<? extends GrantedAuthority> authorities ){
+  public AuthMemberDTO( // 생성자에 전달 받는 매개변수와 인자값
+                String address,     // member.getAddress
+                String name,        // member.getName
+
+                String username,    //member.getEmail
+                String password,    // member.getPassword
+                Collection<? extends GrantedAuthority> authorities // member.getRoleSet()
+                ) {
 
     super(username, password, authorities); // 부모 생성자 호출
 
-    this.email = username;
+    this.name   = name;
+    this.email  = username;
     this.address = address;
   }
 
