@@ -24,6 +24,9 @@ public class BoardDTO {
   @NotEmpty
   private String writer;
 
+  // 현재 로그인 사용자 이메일와 게시글 작성자 이메일 동일한지 판별하기위한 항목
+  private String email;
+
   private LocalDateTime regDate;
   private LocalDateTime modDate;
 

@@ -54,6 +54,14 @@
                    placeholder="반드시 내용이 입력되어야 합니다." >
             <label for="writer">Writer</label>
           </div>
+          <!-- 3-1. 게시글 작성자 이메일 -->
+          <div class="form-floating mb-3">
+            <input type="email" class="form-control"
+                   id="email"
+                   name="email" th:value="${dto.email}" readonly
+                   placeholder="반드시 내용이 입력되어야 합니다." >
+            <label for="email">Email</label>
+          </div>
           <!-- 4. 게시글 등록일, 수정일 -->
           <div class="form-floating mb-3">
             <input type="text" class="form-control"
@@ -91,8 +99,8 @@
                 <button type="button" class="btn btn-secondary" >Modify</button>
               </a>  -->
 
-              <!-- 게시글 작성자(dto.writer)와 로그인 인증자와 동일하면 -->
-              <a  th:if="${user != null && user.name == dto.writer}"
+              <!-- 게시글 작성자(dto.writer)와 로그인 인증자와 동일하면  -->
+              <a  th:if="${user != null && user.username == dto.email}"
                   th:href="|@{/board/modify(bno=${dto.bno})}&${link}|">
                 <button type="button" class="btn btn-secondary" >Modify</button>
               </a>

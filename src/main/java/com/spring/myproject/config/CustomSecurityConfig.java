@@ -1,6 +1,7 @@
 package com.spring.myproject.config;
 
 
+import com.spring.myproject.security.Custom403Handler;
 import com.spring.myproject.service.CustomUserDetailsService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
@@ -79,7 +81,7 @@ public class CustomSecurityConfig {
     http.csrf(AbstractHttpConfigurer::disable)
         .formLogin(login -> {
                     login.loginPage("/members/login")             // 로그인 처리할 url 설정
-                        .defaultSuccessUrl("/board/list")                   // 로그인 성공시 url 설정
+                        .defaultSuccessUrl("/board/list")         // 로그인 성공시 url 설정
                         .usernameParameter("email")               // 웹의 username의  매개변수이름 설정
                         .passwordParameter("password")            // 웹의 password의  매개변수이름 설정
                         //.loginProcessingUrl("/members/login")   // 웹 로그인창의 form action값 설정
@@ -127,6 +129,11 @@ public class CustomSecurityConfig {
           .invalidateHttpSession(true);
     });
 
+    // 5. 접근권한에 맞지 않은 요청시 403에러 핸들러 처리
+    http.exceptionHandling(
+        e -> e.accessDeniedHandler(accessDeniedHandler())
+    );
+
 
     return http.build();
   }
@@ -139,6 +146,12 @@ public class CustomSecurityConfig {
     repo.setDataSource(dataSource);
 
     return repo;
+  }
+
+  // 5-1. 접근권한에 맞지 않은 요청시 403에러 핸들러 처리
+  @Bean
+  public AccessDeniedHandler accessDeniedHandler(){
+    return new Custom403Handler();
   }
 
 }

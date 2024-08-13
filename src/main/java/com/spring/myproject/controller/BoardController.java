@@ -47,12 +47,15 @@ public class BoardController {
     return "board/list";
   }
   // 2. 게시글 등록 입력폼 요청
+  @PreAuthorize("isAuthenticated()")    //로그인 인증 절차 승인 상태인 경우
   @GetMapping("/register")
   public String registerGet(){
     // 게시글 등록 입력 폼 요청
     return "board/register";
   }
   // 2.1 게시글 등록(DB) 작업 처리
+  // 현재 로그인 사용자 이메일와 게시글 작성자 이메일 동일하면 게시글 수정
+  @PreAuthorize("principal.username == #boardDTO.email")
   @PostMapping("/register")
   public String registerPost(@Valid BoardDTO boardDTO,
                              BindingResult bindingResult,
@@ -98,6 +101,8 @@ public class BoardController {
      */
   }
   // 4. 게시글 수정
+  // 현재 로그인 사용자 이메일와 게시글 작성자 이메일 동일하면 게시글 수정
+  @PreAuthorize("principal.username == #boardDTO.email")
   @PostMapping("/modify")
   public String modify(@Valid BoardDTO boardDTO,
                        BindingResult bindingResult,
@@ -136,6 +141,8 @@ public class BoardController {
   }
 
   // 5. 게시글 삭제
+  // 현재 로그인 사용자 이메일와 게시글 작성자 이메일 동일하면 게시글 수정
+  @PreAuthorize("principal.username == #boardDTO.email")
   @PostMapping("/remove")
   public String remove(BoardDTO boardDTO,
                        RedirectAttributes redirectAttributes){

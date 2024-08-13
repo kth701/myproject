@@ -61,8 +61,20 @@
 <!--                   name="writer" th:value="${dto.writer}" readonly-->
 <!--                   placeholder="반드시 내용이 입력되어야 합니다." >-->
 <!--            <label for="writer">Writer</label>-->
-<!--          </div>          -->
-          <!-- 4. 게시글 등록일, 수정일 -->
+<!--          </div>     -->
+
+          <!-- 5. 게시글 작성자 이메일
+           현재 로그인 사용자와 게시글 작성자가 동일한 판별하기위한 항목 -->
+          <div class="form-floating mb-3">
+            <!-- 로그인 상태일 경우만 #authentication객체변수 적용  -->
+            <input type="email" class="form-control"
+                   id="email"
+                   name="email"
+                   th:value="${dto.email}" readonly  />
+            <label for="writer">Email</label>
+          </div>
+
+          <!-- 6. 게시글 등록일, 수정일 -->
           <div class="form-floating mb-3">
             <input type="text" class="form-control"
                    id="regDate"
