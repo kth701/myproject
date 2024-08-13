@@ -71,18 +71,31 @@
           </div>
 
 
-          <!-- 4. List, Modify 버튼: 로그인 상태 정보 객체(#authentication.principal) -->
-          <div class="my-4" th:with="user=${#authentication.principal}">
+          <!-- 4. List, Modify 버튼 -->
+          <!-- 로그인 상태 정보 객체(#authentication.principal:로그인 했을 경우에만 생성되는 객체변수) -->
+          <div class="my-4"
+               sec:authorize="isAuthenticated()"
+               th:with="user=${#authentication.principal}">
+
+            <!-- 로그인 미적용
+            <div class="my-4">   -->
+
             <!-- 현 글번호에 대한 페이징 정보를 넘겨받아서 list요청시 페이징 정보와 같이 요청하면 현재 글번호가 해당되는 list페이지 추출됨 -->
             <div class="float-end" th:with="link=${pageRequestDTO.getLink()}">
 
               <a th:href="|@{/board/list}?${link}|">
                 <button type="button" class="btn btn-primary ">List</button></a>
 
+              <!-- 로그인 미적용
+              <a th:href="|@{/board/modify(bno=${dto.bno})}&${link}|">
+                <button type="button" class="btn btn-secondary" >Modify</button>
+              </a>  -->
+
               <!-- 게시글 작성자(dto.writer)와 로그인 인증자와 동일하면 -->
               <a  th:if="${user != null && user.name == dto.writer}"
                   th:href="|@{/board/modify(bno=${dto.bno})}&${link}|">
-                <button type="button" class="btn btn-secondary" >Modify</button></a>
+                <button type="button" class="btn btn-secondary" >Modify</button>
+              </a>
             </div>
           </div>
 
@@ -99,8 +112,9 @@
         <button class="btn btn-info addReplyBtn">ADD REPLY</button>
       </div>
       <div class="">
-        <ul class="list-group replyList">
-          댓글리스트
+        <ul class="list-group replyList"> <!--  댓글리스트 -->
+          <li class="list-group-item ">
+            댓글이 없습니다.</li>
         </ul>
       </div>
     </div>
@@ -109,8 +123,8 @@
   <!-- 댓글 페이징 -->
   <div class="row mt-3">
     <div class="col">
-      <ul class="pagination replyPaging">
-        댓글 페이징 번호
+      <ul class="pagination replyPaging"> <!--  댓글 페이징 번호 -->
+
       </ul>
     </div>
   </div>
@@ -130,13 +144,22 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div class="input-group mb-3">
-            <span class="input-group-text">Reply Text</span>
-            <input type="text" class="form-control replyText"/>
-          </div>
-          <div class="input-group mb-3">
-            <span class="input-group-text">Replyer</span>
-            <input type="text" class="form-control replyer"/>
+          <!-- 댓글 추가시 현재 로그인한 사용자가 되도록 하기위한 설정 -->
+          <div sec:authorize="isAuthenticated()"
+               th:with="user=${#authentication.principal}">
+
+            <div class="input-group mb-3">
+              <span class="input-group-text">Reply Text</span>
+              <input type="text" class="form-control replyText"/>
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Replyer</span>
+              <!-- 로그인 미적용시
+              <input type="text" class="form-control replyer" />
+               -->
+              <input type="text" class="form-control replyer"
+                     th:value="${user.username}" readonly  />
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -230,14 +253,15 @@
   // 특정 게시글에 대한 댓글 조회 : axios(비동기) 요청 테스트
   // ------------------------------------------------------ //
   // 비동기 처리방식
+  /*
   getReply(bno)
         .then( data => {
                 console.log(data);
                 console.log(data.list);
          })
         .catch( e => {console.log(e)});
-  // ------------------------------------------------------ //
   */
+  // ------------------------------------------------------ //
 
 
   //------------------------------------------------------------------------ //
@@ -249,22 +273,27 @@
   function printPages(data){
     console.log("paging:", data);
 
+
     // pagination
     let pageStr = ''
 
-    // 이전
-    if (data.prev) {
-      pageStr += `<li class="page-item"><a class="page-link" data-page="${data.start-1}">이전</a></li>`
-    }
+   if (data && data.dtoList.length > 0 ){  // 댓글이 있을 경우만  페이징 처리
 
-    // 페이지번호
-    for (let i=data.start; i<=data.end; i++){
-      pageStr += `<li class="page-item ${i==data.page?"active":""}"><a class="page-link" data-page="${i}">${i}</a></li>`
-    }
-    // 다음`
-    if (data.next) {
-    pageStr += `<li class="page-item"><a class="page-link" data-page="${data.end+1}">다음</a></li>`
-    }
+      // 이전 버튼
+      if (data.prev) {
+        pageStr += `<li class="page-item"><a class="page-link" data-page="${data.start-1}">이전</a></li>`
+      }
+
+      // 페이지번호 버튼
+      for (let i=data.start; i<=data.end; i++){
+        pageStr += `<li class="page-item ${i==data.page?"active":""}"><a class="page-link" data-page="${i}">${i}</a></li>`
+      }
+      // 다음 버튼
+      if (data.next) {
+      pageStr += `<li class="page-item"><a class="page-link" data-page="${data.end+1}">다음</a></li>`
+      }
+
+    } // end if
 
     replyPaging.innerHTML = pageStr;
 
@@ -275,8 +304,9 @@
   function printList(replyList){
     let str ='';
 
-    // 댓글이 1개 이상이면 처리
+    // 댓글이 1개 이상이면 처리 댓글 목록 가져와서 View처리
     if (replyList && replyList.length > 0 ){
+
       for (const dto of replyList){
         str +=
         `
@@ -302,20 +332,27 @@
     // 비동기 처리함수 호출
     getList({bno, page, size, goLast})
           .then( data => {
-            //console.log(data.dtoList);
 
-            printList(data.dtoList);// 댓글 목록 처리하는 함수 호출
-            printPages(data);   // 페이징 처리할 함수 호출
+            console.log("printReplies() data.dtoList:",data.dtoList);
 
+            // 댓글에 대한 View처리
+            printList(data.dtoList);          // 댓글 목록 처리하는 함수 호출
+            printPages(data);                 // 페이징 처리할 함수 호출
           })
           .catch(e => {console.log(e)})
   }
 
-  // 1.  게시글에 대한 댓글 요청하는 함수 실행(호출)
+
+  // ------------------------------------------------------------------------ //
+  // 1.  게시글에 대한 댓글 요청하는 함수 실행(호출):
+  //     - 댓글이 있을 경우만 조회및 페이징 처리
+  // ------------------------------------------------------------------------ //
+
   let page = 1; // 현재 페이지 번호
   let size = 5; // 페이지해당 되는 레코드(행)의 개수
   printReplies(page,size,true);// 현재 페이지번호, 페이지 사이즈, 마지막 페이지 사용여부
 
+  // ------------------------------------------------------------------------ //
 
 
 
@@ -379,7 +416,7 @@
 
               registerModal.hide(); // 모달 창 닫기
               replyText.value='';   // 댓글 내용 clear
-              replyer.value='';     // 댓글 작성자 clear
+              //replyer.value='';     // 댓글 작성자 clear: 현재 로그인 상태인 경우는 생략
 
               // 댓글 등록한 후 댓글 List호출
               printReplies(1,10, true)// true설정하면 마지막 페이지 호출
@@ -406,6 +443,13 @@
   const removeBtn = document.querySelector('.removeBtn');
   const closeModifyBtn = document.querySelector('.closeModifyBtn');
 
+  //-------------------------------------------------------------- //
+  // 현재 로그인 사용자와 댓글 작성자가 동일인 경우 수정 작업처리
+    const currentUser = [[${#authentication.principal.username}]]
+    let hasAuth = false     // 댓글의 작성자와 currentUser의 일치 여부
+  //-------------------------------------------------------------- //
+
+  // 댓글 목록에서 특정 댓글 항목을 선택할 경우 처리하는 리스터
   replyList.addEventListener('click', function(e){
     e.stopPropagation();
     // console.log(e)
@@ -427,19 +471,29 @@
     // 댓글 번호가 있으면 처리
     getReply(rno)
         .then(reply => {
-          console.log(reply);
+          console.log("클릭한 댓글내용 :",reply);
 
           replyHeader.innerHTML = reply.rno;
           modifyText.value = reply.replyText;
           modifyModal.show();  // modify 모달창 표시
+
+          // 댓글 작성자와 현재로그인 동일 여부 판단
+          hasAuth = (currentUser === reply.replyer)
         })
         .catch(e => alert('error'));
 
 
   });
 
+  // 댓글 수정
   modifyBtn.addEventListener('click', function(e){
     console.log('modify')
+
+    if (!hasAuth) {               // 댓글 작성자와 현재로그인 동일하지 않으면 처리
+      alert("댓글 작성자만 수정이 가능합니다.");
+      modifyModal.hide()
+      return                      // 함수 종료
+    }
 
     const replyObj = {
       bno: bno,                       // 댓글에 대한 게시글번호
@@ -463,8 +517,17 @@
             .catch(e =>  console.log(e));
 
   });
+
+  // 댓글 삭제
   removeBtn.addEventListener('click', function(e){
     console.log('remove')
+
+
+    if (!hasAuth) {               // 댓글 작성자와 현재로그인 동일하지 않으면 처리
+      alert("댓글 작성자만 삭제 가능합니다.");
+      modifyModal.hide()
+      return                      // 함수 종료
+    }
 
     let isOK = confirm('삭제 하시겠습니까?')
     console.log('remove isOK:', isOK);

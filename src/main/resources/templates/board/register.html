@@ -39,16 +39,19 @@
           </div>
           <!-- 3. 게시글 작성자 -->
           <div class="form-floating mb-3">
+            <!-- 로그인 미적용
+            <input type="text" class="form-control"
+                   placeholder="반드시 내용이 입력되어야 합니다."
+                   id="writer"
+                   name="writer" />    -->
+
+            <!-- 로그인 상태일 경우만 #authentication객체변수 적용  -->
             <input type="text" class="form-control"
                    placeholder="반드시 내용이 입력되어야 합니다."
                    id="writer"
                    name="writer"
                    th:value="${#authentication.principal.name}" readonly
-                   /> <!-- 로그인 상태일 경우만 #authentication객체변수 적용  -->
-
-
-
-
+                   />
             <label for="writer">Writer</label>
           </div>
 

@@ -21,7 +21,7 @@ console.log("/js/reply.js.....")
   const result = await axios.get(
                                   `/replies/list/${bno}`,
                                   { params: {page, size} })
-  console.log("getList() data: ",result)
+  console.log("axios: getList() data: ",result)
 
   //onst total = result.data.total; // 댓글 총 개수
   // 댓글 마지막 페이지 계산 = 댓글 총개수/페이지 사이즈 => 자리올림

@@ -80,7 +80,7 @@ public class BoardController {
   }
 
   // 3. 게시글 조회 및 수정 화면 => /board/read or /baord/modify 요청 처리
-  @PreAuthorize("isAuthenticated()")
+  @PreAuthorize("isAuthenticated()")    //로그인 인증 절차 승인 상태인 경우
   @GetMapping({"/read", "/modify"})
   public void read(Long bno,
                    PageRequestDTO pageRequestDTO,
