@@ -47,6 +47,23 @@ public class RoleController {
     return "@PostAuthorize(ADMIN' 또는 'USER' 이고 isAuthenticated)";
   }
 
+  @GetMapping("/test1")
+  public @ResponseBody String test1(){
+    return "/role/test => permitAll()";
+  }
+  @GetMapping("/test2")
+  public @ResponseBody String test2(){
+    return "/role/test => authenticated()";
+  }
+  @GetMapping("/test3")
+  public @ResponseBody String test3(){
+    return "/role/test => hasRole('USER')";
+  }
+  @GetMapping("/test4")
+  public @ResponseBody String test4(){
+    return "/role/test => hasRole('ADMIN')";
+  }
+
   // 로그인상태 이면서, USER권한을 하지고 있거나, 특정 유저인 경우
 //  @PostAuthorize("isAuthenticated() and (returnObject.name==principal.username)")
 //  @GetMapping("/selectOne/{username}")

@@ -105,22 +105,42 @@ public class CustomSecurityConfig {
                           });
                     });
 
-    // SpringBoot 3v 변경된 코드 확인 authorizeRequests() → authorizeHttpRequests()
-    //http.authorizeRequests().anyRequest().authenticated(); -> http.authorizeHttpRequests().anyRequest().authenticated();
-//    http.authorizeHttpRequests( auth -> {
-//        auth.requestMatchers("/","/members/**").permitAll();
-//        auth.requestMatchers("/board/**").hasRole("ADMIN");
-//        auth.anyRequest().permitAll();
-//    });
-//    http
-//        .authorizeRequests()
-//        .requestMatchers("/","/css/**","/js/**","/members/**").permitAll()
-//        .requestMatchers("/board/list").hasRole("ADMIN")
-//        .requestMatchers("/admin/**").access("hasRole('ADMIN') or hasRole('SYS')")
-//        .anyRequest().authenticated();
+    // 3. 접근 권한 설정
+    // SpringBoot 3v 변경된 코드 확인
+    // 변경전 : authorizeRequests() → 변경후 : authorizeHttpRequests()
+    // http.authorizeRequests().anyRequest().authenticated();
+    // -> http.authorizeHttpRequests().anyRequest().authenticated();
+
+    /* 정적 자원 경로  접근제한 되어 있는 static폴더가 인식 안될 경우
+    * - 1. WebSecurityCustomizer Bean등록 (아래부분)
+    * - 2. WebMvcConfigurer인터페이스를 구현한 config폴더에서 CustomServletConfig클래스에서 경로 재설정 시킴
+    * */
+    http.authorizeHttpRequests( auth -> {
+        // 사용자 인증없이 접근할 수 있도록 설정
+        auth.requestMatchers("/","/members/**").permitAll();
+        // ADMIN Role일 경우에만 접근
+        auth.requestMatchers("/board/**").hasRole("USER");
+        // ADMIN Role일 경우에만 접근
+        auth.requestMatchers("/admin/**").hasRole("ADMIN");
+
+        // 설정해준 경로를 제외한 나머지 경로들은 모두 인증을 요구하도록 설정
+        auth.anyRequest().authenticated();
+        //auth.anyRequest().permitAll();
+    });
 
 
-    // 3. 로그아웃 관련 설정
+
+    /* RoleController 테스트 하기
+    http.authorizeHttpRequests(  httpReq ->
+        httpReq.requestMatchers("/role/test1").permitAll()
+              .requestMatchers("/role/test2").authenticated()
+              .requestMatchers("/role/test3").hasRole("USER")
+              .requestMatchers("/role/test4").hasRole("ADMIN")
+              .anyRequest().permitAll()
+      );`
+     */
+
+    // 4. 로그아웃 관련 설정
     // 로그아웃을 기본으로 설정 => url : "/logout" 로그아웃 수행
     //http.logout(Customizer.withDefaults());
     http.logout(logout -> {
@@ -153,6 +173,18 @@ public class CustomSecurityConfig {
   public AccessDeniedHandler accessDeniedHandler(){
     return new Custom403Handler();
   }
+
+  // 정적 자원은 시큐리티에서 제외되었을 때
+  @Bean
+  public WebSecurityCustomizer webSecurityCustomizer(){
+    log.info("=> web configure: WebSecurityCustomizer");
+
+    return (web) -> web.ignoring()
+                          .requestMatchers(
+                              PathRequest
+                                  .toStaticResources()
+                                  .atCommonLocations());
+  } // end WebSecurityCustomizer
 
 }
 
