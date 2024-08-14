@@ -1,7 +1,36 @@
 package com.spring.myproject.entity;
 
+import jakarta.persistence.*;
+import lombok.*;
 
-public class BoardImage {
+@Entity
+@Getter@Setter
+@AllArgsConstructor@NoArgsConstructor
+@Builder
+@ToString(exclude = "board")
+public class BoardImage implements  Comparable<BoardImage> {
+  @Id
+  private String uuid;
+
+  private String fileName;  // 파일이름
+  private int ord;          // 순번
+
+  // 하나의 게시글에는 여러개의 첨부파일이 연결
+  @ManyToOne(fetch = FetchType.LAZY)
+  // 생략시 : @JoinColumn(name="board_bno") 형식으로 기본설정됨.
+  private Board board;
+
+  @Override
+  public int compareTo(BoardImage other) {
+
+    // 정렬항목이 숫자일 경우
+    return this.ord - other.ord; // 오름차순
+    //return other.ord - this.ord; // 내림차순
+  }
+
+  public void changeBoard(Board board){
+    this.board = board;
+  }
 }
 
 /*

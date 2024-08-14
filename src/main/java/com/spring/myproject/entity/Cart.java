@@ -43,7 +43,7 @@ public class Cart extends BaseEntity { // 공통 멤버변수 상속
 
 
 /*
-@OneToOne
+@OneToOne : 1명의 회원은 1개의 장바구니만 연결
 Cart            <-->     Member
 ---------------------------
 cart_id(PK)     1:1     member_id(PK)

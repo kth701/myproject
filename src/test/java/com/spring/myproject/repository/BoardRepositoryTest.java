@@ -14,10 +14,12 @@ import org.springframework.data.domain.PageRequest;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 
@@ -183,7 +185,60 @@ class BoardRepositoryTest {
   }
 
 
+  //-----------------------------------------//
+  // Board와 BoardImage 연관 관계 테스트
+  //-----------------------------------------//
+  @Test
+  @DisplayName("Board,BoardImage 영속성전이 테스트")
+  public void testInsertWidthImage(){
 
+    // Board Entity 생성
+    Board board = Board.builder()
+        .title("Image Test")
+        .content("첨부파일테스트")
+        .writer("tester")
+        .email("test@test.com")
+        .build();
+
+    for (int i=1; i<=3; i++){
+
+      // 부모객체 내에서 하위객체 생성
+      // board객체에서 BoardImage 객체를 생성
+      board.addImage(UUID.randomUUID().toString(), "file"+i+".jpg");
+
+    };
+
+    // board entity 저장(영속성 컨텍스트에 반영)
+    // board entity를 저장할 하면 board속성중에  boardimage객체를 보관하고 있는
+    /*
+     set객체 정보를 기반으로 boardimage객체가 자동으로 save동작이 발생됨.
+     BoardImageRepository.save(boardImage); 묵시적으로 수행됨.
+     BoardImageRepository 구현 생략 => 자동 생성됨.
+     */
+
+    Board savedBoard = boardRepository.save(board);
+    log.info("==> BoardImage:"+savedBoard);
+
+  }
+
+  @Test
+  @DisplayName("Board,BoardImage 영속성전이 테스트")
+  @Transactional
+  public void testReadWidthImage(){
+    // 반드시 존재하는 bno로 확인
+    Optional<Board> result = boardRepository.findById(1L);
+    Board board = result.orElseThrow();
+
+    log.info("==> board");
+    log.info("-------");
+    log.info(board.getImageSet());
+    // 에러가 발생 됨.
+    // board연결하여 출력한 후 select를 다시실행하면 db가 연결이 끝난 상태이므로
+    // proxy - 'no session' 에러 메시지가 발생
+
+
+
+  }
 
 
 
