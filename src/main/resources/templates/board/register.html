@@ -60,8 +60,8 @@
            현재 로그인 사용자와 게시글 작성자가 동일한 판별하기위한 항목 -->
           <div class="form-floating mb-3">
             <!-- 로그인 상태일 경우만 #authentication객체변수 적용  -->
-            <input type="hidden" class="form-control"
-                   name="email"
+            <input type="hiddien" class="form-control"
+                   name="emal"
                    sec:authorize="isAuthenticated()"
                    th:value="${#authentication.principal.email}" readonly
             />
