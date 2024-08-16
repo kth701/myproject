@@ -1,10 +1,7 @@
 package com.spring.myproject.service;
 
 
-import com.spring.myproject.dto.BoardDTO;
-import com.spring.myproject.dto.BoardListReplyCountDTO;
-import com.spring.myproject.dto.PageRequestDTO;
-import com.spring.myproject.dto.PageResponseDTO;
+import com.spring.myproject.dto.*;
 import com.spring.myproject.entity.Board;
 
 public interface BoardService {
@@ -23,5 +20,8 @@ public interface BoardService {
 
   // 6. 댓글의 숫자 처리하는 인터페이스 : 조회 결과를 List구조에 저장 및 페이징 처리
   PageResponseDTO<BoardListReplyCountDTO> listWithReplyCount(PageRequestDTO pageRequestDTO);
+
+  // 7. 게시글의 이미지와 댓글의 숫자 처리
+  PageResponseDTO<BoardListAllDTO> listWithAll(PageResponseDTO pageResponseDTO);
 
 }
