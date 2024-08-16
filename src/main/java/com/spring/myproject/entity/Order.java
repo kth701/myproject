@@ -32,8 +32,12 @@ public class Order extends BaseEntity {
   // OrderItem에 있는 Order에 의해 관리된다는 의미
 
   // 외래키가 아닌 엔티티를 주인(주체)로 설정 할 경우
+  // => Order Entity 멤버변수(속성)로 연관관계 설정이 아닌 경우
   // 어떤 엔티티의 속성으로 매핑할 경우
-  @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+  // => orderItems.order속성으로 연관관계 설정
+  // @OneToMany => FetchType.LAZY 기본값으로 설정됨.
+  @OneToMany( mappedBy = "order",
+              cascade = CascadeType.ALL)
   private List<OrderItem> orderItems = new ArrayList<>();
 
 
@@ -43,10 +47,10 @@ public class Order extends BaseEntity {
 /*  다대일, 일대다 양방향 맵핑
 주문서 -> 1명의 회원이 여러개의 주문서를 연결
 
-member                        orders                    order_item
---------------------------------------------------------------------
-member_id(PK)                 order_id(PK)              order_item_id(PK)
-name, email,...               member_id(FK),            order_id(FK)
+member                        orders                    order_item                        item
+--------------------------------------------------------------------------------------------------------
+member_id(PK)                 order_id(PK)              order_item_id(PK)                 item_id(PK)
+name, email,...               member_id(FK),            order_id(FK)                      item_name,...
                               order_date,..             item_id(FK)
                                                         order_price, count,....
 
@@ -65,7 +69,7 @@ name, email,...               member_id(FK),            order_id(FK)
 - 주인이 아닌쪽은 연관 관계 매핑시 mappedBy 속성의 값으로 연관관계의 주인을 설정
 - 주인이 아니 쪽은 읽기만 가능
 
-
+- 영속성 전이 : 상위엔티티가 하위엔티티 객체를 관리
 CASCADE종류
 
 PERSIST   부모 엔티티가 영속화 될 때 자식 엔티티도 영속화

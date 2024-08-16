@@ -2,6 +2,7 @@ package com.spring.myproject.repository;
 
 import com.spring.myproject.dto.BoardListReplyCountDTO;
 import com.spring.myproject.entity.Board;
+import com.spring.myproject.entity.Reply;
 import lombok.extern.log4j.Log4j2;
 import org.assertj.core.api.Assert;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -30,6 +32,8 @@ class BoardRepositoryTest {
 
   @Autowired
   private BoardRepository boardRepository;
+  @Autowired
+  private ReplyRepository replyRepository;
 
   @Test
   @DisplayName("insert board data ")
@@ -189,7 +193,7 @@ class BoardRepositoryTest {
   // Board와 BoardImage 연관 관계 테스트
   //-----------------------------------------//
   @Test
-  @DisplayName("Board,BoardImage 영속성전이 테스트")
+  @DisplayName("Board save시,BoardImage 자동으로 save: 영속성 전이 테스트")
   public void testInsertWidthImage(){
 
     // Board Entity 생성
@@ -222,7 +226,7 @@ class BoardRepositoryTest {
   }
 
   @Test
-  @DisplayName("Board,BoardImage 영속성전이 테스트")
+  @DisplayName("Board read시,BoardImage read: 영속성 전이 테스트")
   @Transactional
   public void testReadWidthImage(){
     // 반드시 존재하는 bno로 확인
@@ -231,17 +235,85 @@ class BoardRepositoryTest {
 
     log.info("==> board");
     log.info("-------");
-    log.info(board.getImageSet());
+    log.info(board.getImageSet());// board안에 있는 boardimage엔티티 조회(select...)
     // 에러가 발생 됨.
     // board연결하여 출력한 후 select를 다시실행하면 db가 연결이 끝난 상태이므로
-    // proxy - 'no session' 에러 메시지가 발생
+    // proxy - 'no session' 에러 메시지가 발생 => @Transactional 해결됨.
+
+  }
 
 
+  @Test
+  @DisplayName("Board,BoardImage(EntityGraph): 영속성 전이 테스트")
+  public void testReadWidthImageEntityGraph(){
+    // 반드시 존재하는 bno로 확인
+    Optional<Board> result = boardRepository.findByIdWidthImages(1L);
+    Board board = result.orElseThrow();
+
+    log.info("==> board와 boardImage EntityGraph:");
+    log.info("-------");
+
+    board.getImageSet().forEach( boardImage -> {
+      log.info(boardImage);
+    });
 
   }
 
 
 
+  @Test
+  @DisplayName("Board,BoardImage remove: 고아객체 테스트")
+  @Transactional@Commit
+  public void testBoardAndBoardImageRemove(){
+    // 1번 게시물 가져오기
+    Optional<Board> result = boardRepository.findByIdWidthImages(1L);
+    Board board = result.orElseThrow();
+
+    // 기존 게시물에 첨부파일들 삭제:
+    // 1. orphanRemoval = true 설정하지 않을 경우: null 값으로 업데이트 기능 처리됨.
+    // 2. orphanRemoval = true 설정 경우: null값이 존재하는 고아객체 제거됨.
+    board.clearImage();
+
+    // 새로운 첨부파일 추가
+    for (int i=1; i<=3; i++){
+      board.addImage(UUID.randomUUID().toString(), "file"+i+".jpg");
+    };
+    boardRepository.save(board);
+
+  }
+
+
+  @Test
+  @DisplayName("특정 게시글에 대한 댓글 삭제 테스트")
+  @Transactional@Commit
+  public void testBoardReplyRemoveAll(){
+    Long bno = 1L;
+
+    /*
+    // 1. 특정 게시글에 대한 댓글 생성
+    Board board = boardRepository.findById(bno).orElseThrow();
+    for (int i=1; i<=2; i++) {
+      Reply reply = Reply.builder()
+          .board(board)
+          .replyText("댓글...")
+          .replyer("replyer1")
+          .build();
+
+      replyRepository.save(reply);
+    }//end for
+
+     */
+
+
+    // Reply 존재하는 경우 댓글 삭제 -> BoardImage 삭제(imageSet.clear())-> Board 삭제
+    // 2. 댓글 삭제
+    replyRepository.deleteByBoard_Bno(bno);
+
+    // 3. 게시글 삭제
+    boardRepository.deleteById(bno);
+
+
+  }
 
 
 
