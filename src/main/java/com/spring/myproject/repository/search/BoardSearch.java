@@ -23,4 +23,10 @@ public interface BoardSearch {
                                                     Pageable pageable);
 
 
+  // 게시물 조건 검색 조회 인터페이스
+  Page<BoardListReplyCountDTO> searchWithAll(String[] types, String keyword, Pageable pageable);
+
+
+
+
 }

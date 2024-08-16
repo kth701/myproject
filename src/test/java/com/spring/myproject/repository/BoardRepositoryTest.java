@@ -38,6 +38,8 @@ class BoardRepositoryTest {
   @Test
   @DisplayName("insert board data ")
   public void testInsertBoard(){
+    // 1. 테스트를 위한 더미 데이터 생성
+    /*
     IntStream.rangeClosed(1,100).forEach( i->{
       Board board = Board.builder()
           .title("title..."+i)
@@ -49,6 +51,32 @@ class BoardRepositoryTest {
       log.info("BNO: "+result.getBno());
 
     });
+     */
+
+    // 2. 테스트를 위한 더미 데이터 생성(게시글 이미지포함)
+    for( int i=1; i<=100; i++){
+      Board board = Board.builder()
+          .title("title..."+i)
+          .content("content..."+i)
+          .writer("user"+(i%10))
+          .build();
+
+      // 게시물 1개당 3개의 첨부파일 생성
+      for(int j=1; j<=3; j++){
+        if (i%5==0) continue;
+
+        board.addImage(UUID.randomUUID().toString(), i+"file"+j+".jpg");
+        log.info("i="+i+", j="+j);
+
+      }; // inner for
+
+      boardRepository.save(board);//board 저장
+
+    }; // outer for
+
+
+
+
   }
 
   @Test
@@ -301,17 +329,25 @@ class BoardRepositoryTest {
 
       replyRepository.save(reply);
     }//end for
-
      */
 
 
     // Reply 존재하는 경우 댓글 삭제 -> BoardImage 삭제(imageSet.clear())-> Board 삭제
     // 2. 댓글 삭제
     replyRepository.deleteByBoard_Bno(bno);
-
     // 3. 게시글 삭제
     boardRepository.deleteById(bno);
+  }
 
+  @Test
+  @DisplayName("특정 게시글에 대한 댓글 조회 테스트")
+  @Transactional@Commit
+  public void testsearchImageReplyCount(){
+    // 페이징 초기값 설정
+    Pageable pageable = PageRequest.of(0, 10, Sort.by("bno").descending());
+
+    // 게시물 1개당 이미지첩부파일 조회
+    boardRepository.searchWithAll(null, null, pageable);
 
   }
 

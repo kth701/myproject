@@ -34,7 +34,7 @@ class ReplyRepositoryTest {
   @Test@DisplayName("Reply객체 생성하기")
   public void testInsertReply(){
 
-    /* 1. 댓글 생성 하기 */
+    /* 1. 댓글 생성 하기
     // 특정 게시글 가져오기
     Long bno = 100L;
 
@@ -57,11 +57,14 @@ class ReplyRepositoryTest {
       replyRepository.save(reply);
     }//end for
 
-    /*
-    // 2. 댓글 300개 생성하기
+     */
+
+
+    // 2. 1에서 100사이 게시글에 대해 무작위로 게시글을 선정하여 댓글 300개 생성하고,
+    //    무작위로 선정되 게시글에 대해 댓글 달기
     IntStream.rangeClosed(1, 300).forEach(i -> {
 
-      // 게시글 번호 무작위 선정
+      // 게시글 번호 무작위 선정(1에서 100사이)
       long bno = (long) (Math.random()*100)+1;
       Board board = Board.builder().bno(bno).build();
 
@@ -78,7 +81,7 @@ class ReplyRepositoryTest {
 
     });
 
-     */
+
 
 
   }

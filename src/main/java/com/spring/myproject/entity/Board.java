@@ -3,6 +3,7 @@ package com.spring.myproject.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -44,11 +45,15 @@ public class Board extends BaseEntity {
   // 2. 고아객체: 부모엔티티와 연관관계가 끊어진 자식엔티티
   //    고아객체 제거 :  (orphanRemoval속성=true)
   //    @OneToOne, @OneToMany에 사용
+
+  // 3. 'N+1'로 실행되는 쿼리는 DB많이 사용 단점 => @BatchSize어노테이션 활용
+  //    'N번'에 해당하는 쿼리를 모아서 한 번에 실행
   @OneToMany(mappedBy = "board",
              cascade = {CascadeType.ALL},
              fetch = FetchType.LAZY,
              orphanRemoval = true  )
   @Builder.Default
+  @BatchSize(size = 20)
   private Set<BoardImage> imageSet = new HashSet<>();
 
 
@@ -77,6 +82,10 @@ public class Board extends BaseEntity {
     this.imageSet.clear(); // boardImage객체 데이터 삭제
   }
 }
+
+
+
+
 
 /*
  스프링 계층 구조

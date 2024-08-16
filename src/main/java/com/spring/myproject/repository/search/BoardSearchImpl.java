@@ -7,6 +7,7 @@ import com.querydsl.jpa.JPQLQuery;
 import com.spring.myproject.dto.BoardListReplyCountDTO;
 import com.spring.myproject.entity.Board;
 
+import com.spring.myproject.entity.BoardImage;
 import com.spring.myproject.entity.QBoard;
 import com.spring.myproject.entity.QReply;
 import lombok.extern.log4j.Log4j2;
@@ -212,6 +213,34 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
     long count = dtoQuery.fetchCount();
 
     return new PageImpl<>(dtoList, pageable, count);
+  }
+
+  // 게시물 조건 검색 조회 구현
+  @Override
+  public Page<BoardListReplyCountDTO> searchWithAll(String[] types, String keyword, Pageable pageable) {
+
+    QBoard board = QBoard.board;
+    QReply reply = QReply.reply;
+
+    // 1. 쿼리문 작성(댓글 기준으로 게시글 연결)
+    JPQLQuery<Board> boardJPQLQuery = from(board);
+    boardJPQLQuery.leftJoin(reply).on(reply.board.eq(board));// left join => 댓글 기준으로 게시글 조인
+    // 1.1 페이징 설정
+    getQuerydsl().applyPagination(pageable, boardJPQLQuery); // paging 설정
+
+    // 2. 쿼리문 실행 결과
+    List<Board> boardList = boardJPQLQuery.fetch();
+
+    boardList.forEach(board1 -> {
+      log.info("=> board bno:"+board1.getBno());
+      for (BoardImage boardImage : board1.getImageSet()) {
+        log.info("=> boardImages:"+boardImage);
+      }
+      log.info("-------------");
+
+    });
+
+    return null;
   }
 
 }
