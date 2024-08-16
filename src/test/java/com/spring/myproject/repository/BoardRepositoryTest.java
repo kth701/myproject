@@ -340,7 +340,7 @@ class BoardRepositoryTest {
   }
 
   @Test
-  @DisplayName("특정 게시글에 대한 댓글 조회 테스트")
+  @DisplayName("게시글에 대한 댓글 조회 테스트")
   @Transactional@Commit
   public void testsearchImageReplyCount(){
     // 페이징 초기값 설정

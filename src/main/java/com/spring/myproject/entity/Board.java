@@ -48,6 +48,18 @@ public class Board extends BaseEntity {
 
   // 3. 'N+1'로 실행되는 쿼리는 DB많이 사용 단점 => @BatchSize어노테이션 활용
   //    'N번'에 해당하는 쿼리를 모아서 한 번에 실행
+  /*
+       select
+          is1_0.board_bno,
+          is1_0.uuid,
+          is1_0.file_name,
+          is1_0.ord
+      from
+          board_image is1_0
+      where
+        is1_0.board_bno in (?, ?, ?, ...)
+   */
+  //    지정된 수만큼 BoardImage를 조회할 때 한 번에 in조건으로 사용
   @OneToMany(mappedBy = "board",
              cascade = {CascadeType.ALL},
              fetch = FetchType.LAZY,
