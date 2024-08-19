@@ -61,10 +61,15 @@ public class Board extends BaseEntity {
    */
   //    지정된 수만큼 BoardImage를 조회할 때 한 번에 in조건으로 사용
   @OneToMany(mappedBy = "board",
-             cascade = {CascadeType.ALL},
+             cascade = {CascadeType.ALL}, // 영속성의 전이
+              // @EntityGraph=>  BoardRepository에서 설정하면
+              // 지연(lazy)로딩이라고 해도 한번에 조인 처리해서 select가 수행
+              //board조회시 boardImage항목은 즉시 조회로 설정(@EntityGraph설정)
              fetch = FetchType.LAZY,
              orphanRemoval = true  )
   @Builder.Default
+  // 'N+1' 쿼리문 실행, N:게시물 마다 각각 실행되는 쿼리, 1은 목을 가져오는 쿼리
+  // BoardImage를 조회할 때 한번에 in조건으로 사용
   @BatchSize(size = 20)
   private Set<BoardImage> imageSet = new HashSet<>();
 

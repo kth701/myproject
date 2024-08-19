@@ -1,5 +1,6 @@
 package com.spring.myproject.repository;
 
+import com.spring.myproject.dto.BoardListAllDTO;
 import com.spring.myproject.dto.BoardListReplyCountDTO;
 import com.spring.myproject.entity.Board;
 import com.spring.myproject.entity.Reply;
@@ -59,18 +60,22 @@ class BoardRepositoryTest {
           .title("title..."+i)
           .content("content..."+i)
           .writer("user"+(i%10))
+          .email("email"+i+"@gmail.com")
           .build();
 
       // 게시물 1개당 3개의 첨부파일 생성
       for(int j=1; j<=3; j++){
         if (i%5==0) continue;
 
+        // boardImage객체 3개 생성에서 set저장
         board.addImage(UUID.randomUUID().toString(), i+"file"+j+".jpg");
         log.info("i="+i+", j="+j);
 
       }; // inner for
 
+      // 영속성의 전이 => 부모엔티티 저장시 자식엔티티 저장 작동
       boardRepository.save(board);//board 저장
+
 
     }; // outer for
 
@@ -254,25 +259,29 @@ class BoardRepositoryTest {
   }
 
   @Test
-  @DisplayName("Board read시,BoardImage read: 영속성 전이 테스트")
+  @DisplayName("Board read시,BoardImage read: lazy상태일 경우 ")
   @Transactional
   public void testReadWidthImage(){
     // 반드시 존재하는 bno로 확인
     Optional<Board> result = boardRepository.findById(1L);
     Board board = result.orElseThrow();
 
+
     log.info("==> board");
     log.info("-------");
-    log.info(board.getImageSet());// board안에 있는 boardimage엔티티 조회(select...)
+
     // 에러가 발생 됨.
     // board연결하여 출력한 후 select를 다시실행하면 db가 연결이 끝난 상태이므로
     // proxy - 'no session' 에러 메시지가 발생 => @Transactional 해결됨.
+
+    // board안에 있는 boardimage엔티티 조회(select...)
+    log.info(board.getImageSet());
 
   }
 
 
   @Test
-  @DisplayName("Board,BoardImage(EntityGraph): 영속성 전이 테스트")
+  @DisplayName("Board,BoardImage read: @EntityGraph 적용")
   public void testReadWidthImageEntityGraph(){
     // 반드시 존재하는 bno로 확인
     Optional<Board> result = boardRepository.findByIdWidthImages(1L);
@@ -281,6 +290,8 @@ class BoardRepositoryTest {
     log.info("==> board와 boardImage EntityGraph:");
     log.info("-------");
 
+    // @EntityGraph어노테이션 사용시
+    // lazy일지라도 boardImage을 즉시로딩이 가능함.
     board.getImageSet().forEach( boardImage -> {
       log.info(boardImage);
     });
@@ -340,16 +351,34 @@ class BoardRepositoryTest {
   }
 
   @Test
-  @DisplayName("게시글에 대한 댓글 조회 테스트")
-  @Transactional@Commit
+  @DisplayName("게시글에 대한 댓글개수, 이미지 조회 테스트")
+  @Transactional
   public void testsearchImageReplyCount(){
     // 페이징 초기값 설정
     Pageable pageable = PageRequest.of(0, 10, Sort.by("bno").descending());
 
-    // 게시물 1개당 이미지첩부파일 조회
-    boardRepository.searchWithAll(null, null, pageable);
+    // 1. 게시물 1개당 이미지첩부파일 조회
+    //boardRepository.searchWithAll(null, null, pageable);
+
+    // 2. 게시물 조회 및 댓글 개수, 게시물이미지 조회
+    Page<BoardListAllDTO> result = boardRepository.searchWithAll(null, null, pageable);
+
+    log.info("---------");
+    log.info(result.getTotalElements());
+     result.getContent()
+         .forEach(boardListAllDTO -> {
+           //log.info(boardListAllDTO);
+           log.info("\n=> 게시글번호:"+boardListAllDTO.getBno());
+           log.info("=> 댓글개수:"+boardListAllDTO.getReplyCount());
+           boardListAllDTO.getBoardImages().forEach( boardImage ->{
+             log.info("=> 게시글이미지:"+boardImage);
+           });
+           log.info("-----");
+         });
 
   }
+
+
 
 
 

@@ -13,6 +13,7 @@ import java.util.Optional;
 
 public interface BoardRepository extends
                                   JpaRepository<Board, Long>,
+                                  // Board검색기능 상속(BoardSearch)
                                   BoardSearch {
 
   // 메서드 상속 받음 (extends BoardSearch)
@@ -21,6 +22,7 @@ public interface BoardRepository extends
 
   // Board와 BoardImage 연관관계 : @OneToMany설정시 => BoardImage는 지연 로딩 상태
   // @OneToMany: 기본적으로 지연로딩을 이용 :  fetch = FetchType.LAZY
+
   // @EntityGraph: 지연로딩일지라도 한 번에 조인 처리해서 select처리하도록 설정
   @EntityGraph(attributePaths = {"imageSet"})
   @Query("select b from Board b where b.bno = :bno")

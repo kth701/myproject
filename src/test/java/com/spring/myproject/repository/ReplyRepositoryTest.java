@@ -73,7 +73,7 @@ class ReplyRepositoryTest {
           // board_bno필드만 생성하여 board의 pk필드 bno값을 설정하고 join상태 설정
           .board(board)   //=> .board_bno(board.getBno())
           .replyText("댓글..."+i)
-          .replyer("replyer")
+          .replyer("replyer"+i)
           .build();
 
       // db처리

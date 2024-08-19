@@ -2,8 +2,11 @@ package com.spring.myproject.repository.search;
 
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
+import com.spring.myproject.dto.BoardImageDTO;
+import com.spring.myproject.dto.BoardListAllDTO;
 import com.spring.myproject.dto.BoardListReplyCountDTO;
 import com.spring.myproject.entity.Board;
 
@@ -18,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Log4j2
 public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardSearch {
@@ -217,20 +221,29 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
 
   // 게시물 조건 검색 조회 구현
   @Override
-  public Page<BoardListReplyCountDTO> searchWithAll(String[] types, String keyword, Pageable pageable) {
+  public Page<BoardListAllDTO> searchWithAll(
+                                String[] types,
+                                String keyword,
+                                Pageable pageable) {
 
     QBoard board = QBoard.board;
     QReply reply = QReply.reply;
 
     // 1. 쿼리문 작성(댓글 기준으로 게시글 연결)
     JPQLQuery<Board> boardJPQLQuery = from(board);
-    boardJPQLQuery.leftJoin(reply).on(reply.board.eq(board));// left join => 댓글 기준으로 게시글 조인
-    // 1.1 페이징 설정
+                      boardJPQLQuery
+                          .leftJoin(reply)
+                          .on(reply.board.eq(board));// left join => 댓글 기준으로 게시글 조인
+    // 1.1 : 게시글 그룹핑 처리
+    boardJPQLQuery.groupBy(board);
+    // 1.2 페이징 설정
     getQuerydsl().applyPagination(pageable, boardJPQLQuery); // paging 설정
 
-    // 2. 쿼리문 실행 결과
+    /*
+    // 2. 쿼리문 실행 :결과값을 List에 반환
     List<Board> boardList = boardJPQLQuery.fetch();
 
+    // 3.쿼리문 결과 콘솔에 출력
     boardList.forEach(board1 -> {
       log.info("=> board bno:"+board1.getBno());
       for (BoardImage boardImage : board1.getImageSet()) {
@@ -239,8 +252,54 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
       log.info("-------------");
 
     });
+     */
 
-    return null;
+    // 5. 쿼리문 작성 : 댓글 개수 파악 => (select항목은 그룹(board bno)핑된 게시글정보, 게시글번호기준으로 카운터)
+    JPQLQuery<Tuple> tupeJPQLQuery = boardJPQLQuery.select(board, reply.countDistinct());
+
+    List<Tuple> tupleList = tupeJPQLQuery.fetch();
+
+    List<BoardListAllDTO> dtoList = tupleList.stream().map( tuple -> {
+      Board board1 = (Board) tuple.get(board);
+      // 또는 Board board1 =  tuple.get(0, Board.class);
+
+      // 필드명없는 관계로 컬럼의 위치 및 타입설정
+      long replyCount = (Long)tuple.get(reply.countDistinct());
+      // 또는 long replyCount = tuple.get(1, Long.class);
+
+
+      BoardListAllDTO dto = BoardListAllDTO.builder()
+          .bno(board1.getBno())
+          .title(board1.getTitle())
+          .write(board1.getWriter())
+          .email(board1.getEmail())
+          .regDate(board1.getRegDate())
+          .replyCount(replyCount)
+          .build();
+
+      // BoardImage-> BoardImageDTO
+      List<BoardImageDTO> imageDTOS =
+          board1.getImageSet()
+              .stream()
+              .sorted()
+              // boardImage Entity -> boardImage DTO
+              .map(boardImage -> BoardImageDTO.builder()
+                  .uuid(boardImage.getUuid())
+                  .fileName(boardImage.getFileName())
+                  .ord(boardImage.getOrd())
+                  .build()
+              )
+              .collect(Collectors.toList());
+
+      dto.setBoardImages(imageDTOS);
+      return dto;
+
+    }).collect(Collectors.toList());
+
+    long totalcount = boardJPQLQuery.fetchCount();
+
+    return new PageImpl<>(dtoList, pageable, totalcount);
+
   }
 
 }
