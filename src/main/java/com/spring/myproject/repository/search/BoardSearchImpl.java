@@ -234,6 +234,27 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
                       boardJPQLQuery
                           .leftJoin(reply)
                           .on(reply.board.eq(board));// left join => 댓글 기준으로 게시글 조인
+
+    // 5. 조건문 추가 : where 문 작성
+    if ( (types != null && types.length > 0) && keyword != null){// 검색 키워드가 있으면
+      //  BooleanBuilder: 조건문을 작성하는 클래스
+      BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+      for (String type : types){
+        switch (type){
+          case "t":
+            booleanBuilder.or(board.title.contains(keyword));break;
+          case "c":
+            booleanBuilder.or(board.content.contains(keyword));break;
+          case "w":
+            booleanBuilder.or(board.writer.contains(keyword));break;
+        }
+      } // end for
+
+      boardJPQLQuery.where(booleanBuilder);
+    }// end if
+
+
     // 1.1 : 게시글 그룹핑 처리
     boardJPQLQuery.groupBy(board);
     // 1.2 페이징 설정
@@ -254,7 +275,7 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
     });
      */
 
-    // 5. 쿼리문 작성 : 댓글 개수 파악 => (select항목은 그룹(board bno)핑된 게시글정보, 게시글번호기준으로 카운터)
+    // 4. 쿼리문 작성 : 댓글 개수 파악 => (select항목은 그룹(board bno)핑된 게시글정보, 게시글번호기준으로 카운터)
     JPQLQuery<Tuple> tupeJPQLQuery = boardJPQLQuery.select(board, reply.countDistinct());
 
     List<Tuple> tupleList = tupeJPQLQuery.fetch();
@@ -263,9 +284,8 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
       Board board1 = (Board) tuple.get(board);
       // 또는 Board board1 =  tuple.get(0, Board.class);
 
-      // 필드명없는 관계로 컬럼의 위치 및 타입설정
       long replyCount = (Long)tuple.get(reply.countDistinct());
-      // 또는 long replyCount = tuple.get(1, Long.class);
+      // 또는 long replyCount = tuple.get(1, Long.class); // 필드명없는 관계로 컬럼의 위치 및 타입설정
 
 
       BoardListAllDTO dto = BoardListAllDTO.builder()

@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
+import java.util.Arrays;
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -32,7 +35,17 @@ class BoardServiceTest {
         .title("Sample Title...")
         .content("Sample Content...")
         .writer("user00")
+        .email("test@gmail.com")
         .build();
+
+    // 첨부파일 추가
+    boardDTO.setFileNames(
+        Arrays.asList(
+            UUID.randomUUID()+"_aaa.jpg",
+            UUID.randomUUID()+"_bbb.jpg",
+            UUID.randomUUID()+"_ccc.jpg"
+        )
+    );
 
     Long bno = boardService.register(boardDTO);
     log.info("=> bno: "+bno);

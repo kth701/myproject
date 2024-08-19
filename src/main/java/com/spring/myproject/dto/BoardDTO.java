@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -31,4 +32,5 @@ public class BoardDTO {
   private LocalDateTime modDate;
 
   // 첨부파일 이름
+  private List<String> fileNames;
 }
