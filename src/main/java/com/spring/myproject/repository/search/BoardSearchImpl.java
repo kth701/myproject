@@ -231,11 +231,11 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
 
     // 1. 쿼리문 작성(댓글 기준으로 게시글 연결)
     JPQLQuery<Board> boardJPQLQuery = from(board);
-                      boardJPQLQuery
-                          .leftJoin(reply)
-                          .on(reply.board.eq(board));// left join => 댓글 기준으로 게시글 조인
+                    boardJPQLQuery
+                        .leftJoin(reply)
+                        .on(reply.board.eq(board));// left join => 댓글 기준으로 게시글 조인
 
-    // 5. 조건문 추가 : where 문 작성
+    // 5. 검색 조건문 추가 : where 문 작성
     if ( (types != null && types.length > 0) && keyword != null){// 검색 키워드가 있으면
       //  BooleanBuilder: 조건문을 작성하는 클래스
       BooleanBuilder booleanBuilder = new BooleanBuilder();
@@ -281,23 +281,21 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
     List<Tuple> tupleList = tupeJPQLQuery.fetch();
 
     List<BoardListAllDTO> dtoList = tupleList.stream().map( tuple -> {
-      Board board1 = (Board) tuple.get(board);
-      // 또는 Board board1 =  tuple.get(0, Board.class);
+      Board board1 = (Board) tuple.get(board);                      // 또는 Board board1 =  tuple.get(0, Board.class);
+      long replyCount = (Long)tuple.get(reply.countDistinct());     // 또는 long replyCount = tuple.get(1, Long.class); // 필드명없는 관계로 컬럼의 위치 및 타입설정
 
-      long replyCount = (Long)tuple.get(reply.countDistinct());
-      // 또는 long replyCount = tuple.get(1, Long.class); // 필드명없는 관계로 컬럼의 위치 및 타입설정
-
-
-      BoardListAllDTO dto = BoardListAllDTO.builder()
+      // boardListAllDTO 객체 생성하여 관련 entity 정보 저장하기
+      BoardListAllDTO boardListAllDTO = BoardListAllDTO.builder()
+          // 1. board entity -> board dto
           .bno(board1.getBno())
           .title(board1.getTitle())
           .write(board1.getWriter())
           .email(board1.getEmail())
           .regDate(board1.getRegDate())
-          .replyCount(replyCount)
+          .replyCount(replyCount)   //  2. reply count -> replycount dto
           .build();
 
-      // BoardImage-> BoardImageDTO
+      // 3. BoardImage-> BoardImageDTO
       List<BoardImageDTO> imageDTOS =
           board1.getImageSet()
               .stream()
@@ -308,15 +306,15 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
                   .fileName(boardImage.getFileName())
                   .ord(boardImage.getOrd())
                   .build()
-              )
-              .collect(Collectors.toList());
+              ).collect(Collectors.toList());
 
-      dto.setBoardImages(imageDTOS);
-      return dto;
+      //  4. boardImageDTO -> boardListAllDTO
+      boardListAllDTO.setBoardImages(imageDTOS);
 
+      return boardListAllDTO; // end map()
     }).collect(Collectors.toList());
 
-    long totalcount = boardJPQLQuery.fetchCount();
+    long totalcount = boardJPQLQuery.fetchCount(); // 게시글 전체 개수
 
     return new PageImpl<>(dtoList, pageable, totalcount);
 

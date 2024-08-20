@@ -15,4 +15,8 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
   // 2. 해당 게시글에 대한 댓글 삭제:
   //   댓글이 참조하는 게시글 번호(부모 객체) 삭제
   void deleteByBoard_Bno(Long bno);
+
+  // 1. 댓글 유무 체크
+  @Query("select count(r) from Reply r where r.board.bno = :bno")
+  Long replyCount(Long bno);
 }

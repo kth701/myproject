@@ -31,6 +31,6 @@ public class BoardDTO {
   private LocalDateTime regDate;
   private LocalDateTime modDate;
 
-  // 첨부파일 이름
-  private List<String> fileNames;
+  // 첨부파일 이름: html에서 첨부파일 UI <input type="file"../> 배열구조형식
+  private List<String> fileNames;// 1개이상 파일이름 저장
 }

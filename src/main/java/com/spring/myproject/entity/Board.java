@@ -85,8 +85,8 @@ public class Board extends BaseEntity {
     BoardImage boardImage = BoardImage.builder()
         .uuid(uuid)
         .fileName(fileName)
-        .board(this)
-        .ord(imageSet.size())
+        .board(this)  // 현재 게시물 이미지와 게시물과 연관관계
+        .ord(imageSet.size()) // 0, 1, 2,....
         .build();
 
     // 첨부파일 생성하여 Set추가
@@ -95,8 +95,11 @@ public class Board extends BaseEntity {
 
   // 삭제 처리 기능
   public void clearImage(){
+    // boardImage에있는 boardBno에 연관관계 삭제, 즉 고아 객체로 설정
     imageSet.forEach( boardImg -> boardImg.changeBoard(null));
-    this.imageSet.clear(); // boardImage객체 데이터 삭제
+    // set객체을 clear()하면 set객체를 비우면서
+    // boardImage객체 데이터 삭제됨
+    this.imageSet.clear();
   }
 }
 

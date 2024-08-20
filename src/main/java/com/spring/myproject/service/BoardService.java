@@ -24,11 +24,11 @@ public interface BoardService {
   // 6. 댓글의 숫자 처리하는 인터페이스 : 조회 결과를 List구조에 저장 및 페이징 처리
   PageResponseDTO<BoardListReplyCountDTO> listWithReplyCount(PageRequestDTO pageRequestDTO);
 
-  // 7. 게시글의 이미지와 댓글의 숫자 처리
-  PageResponseDTO<BoardListAllDTO> listWithAll(PageResponseDTO pageResponseDTO);
 
-  // 8. List<Setring> fileName -> Board에서 Set<boardImage>타입으로 변환
+  // 7. DTO -> entity 변환 : 등록 기능
+  // List<Setring> fileName -> Board에서 Set<boardImage>타입으로 변환
   default Board dtoToEntity(BoardDTO boardDTO){
+    // getter dto -> setter entity -> db table 저장
     Board board = Board.builder()
         .bno(boardDTO.getBno())
         .title(boardDTO.getTitle())
@@ -40,7 +40,7 @@ public interface BoardService {
     // 첨부파일이 있을 경우
     if (boardDTO.getFileNames() != null){
       boardDTO.getFileNames().forEach(fileName ->{
-        String[] arr = fileName.split("_");
+        String[] arr = fileName.split("_");   // 첨부파일 이름 구성 : "UUID값"+"_"+"파일이름.확장자"
         board.addImage(arr[0], arr[1]);
       });
     }
@@ -49,8 +49,9 @@ public interface BoardService {
   } // end dtoToEntity
 
 
-  // entity -> dto
+  //  8. entity -> dto : 조회 기능
   default BoardDTO entityToDto(Board board){
+    // getter entity -> setter dto
     BoardDTO boardDTO = BoardDTO.builder()
         .bno(board.getBno())
         .title(board.getTitle())
@@ -60,13 +61,23 @@ public interface BoardService {
         .modDate(board.getModDate())
         .build();
 
+    // boardImage entity getter -> List 저장
     List<String> fileNames =
         board.getImageSet()
             .stream()
             .sorted()
-            .map(boardImage -> boardImage.getUuid()+"_"+boardImage.getFileName())
+            .map(boardImage ->
+                boardImage.getUuid()+"_"+boardImage.getFileName()
+            )
             .collect(Collectors.toList());
+
+    // 첨부파일 fileNames객체를  boardDTO fileNames에 setter()
+    boardDTO.setFileNames(fileNames);
 
     return boardDTO;
   }
+
+  // 9. 게시글의 이미지와 댓글의 숫자 처리
+  PageResponseDTO<BoardListAllDTO> listWithAll(PageRequestDTO pageRequestDTO);
+
 }

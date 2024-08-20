@@ -3,6 +3,7 @@ package com.spring.myproject.service;
 import com.spring.myproject.dto.*;
 import com.spring.myproject.entity.Board;
 import com.spring.myproject.repository.BoardRepository;
+import com.spring.myproject.repository.ReplyRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class BoardServiceImpl implements BoardService {
+  private final ReplyRepository replyRepository;
 
   private final ModelMapper modelMapper;
   private final BoardRepository boardRepository;
@@ -34,16 +36,21 @@ public class BoardServiceImpl implements BoardService {
     // 2. DTO -> Entity  첨부파일 추가한 경우
     Board board = dtoToEntity(boardDTO);
 
+    // 3. board entity 저장
     Long bno = boardRepository.save(board).getBno();
-
-
+    //Board savedBoard = boardRepository.save(board);
 
     return bno;
   }
 
   @Override
   public BoardDTO readOne(Long bno) {
-    Optional<Board> result = boardRepository.findById(bno);
+    // 1. fetch = FetchType.LAZY 상태일 경우 boardImage 즉시로딩안됨
+    // Optional<Board> result = boardRepository.findById(bno);
+
+    // 2. fetch = FetchType.LAZY 상태인 경우에도 즉시로딩 (@EntityGraph)
+    Optional<Board> result = boardRepository.findByIdWidthImages(bno);
+
     // optional -> entity
     Board board = result.orElseThrow();
 
@@ -61,6 +68,19 @@ public class BoardServiceImpl implements BoardService {
     Board board = result.orElseThrow();
     // entity값을 dto값으로 변경
     board.change(boardDTO.getTitle(), boardDTO.getContent());
+
+    // --------------------------------------------------------//
+    // 첨부파일 있을 경우 처리 : 기존에 첨부파일 삭제후 추가하는 형식
+    board.clearImage();
+    // 수정된 첨부파일이 있을 경우
+    if (boardDTO.getFileNames() != null) {
+      for (String fileName : boardDTO.getFileNames()){
+        String[] arr = fileName.split("_");
+        board.addImage(arr[0],arr[1]);
+      }
+    }
+    // --------------------------------------------------------//
+
     // 저장하기
     Board modBoard = boardRepository.save(board);
 
@@ -69,6 +89,18 @@ public class BoardServiceImpl implements BoardService {
 
   @Override
   public void remove(Long bno) {
+
+    // --------------------------------------------------------------  //
+    // 댓글이 있는 경우 댓글 먼저삭제
+    long count = replyRepository.replyCount(bno);
+    //log.info("=> bno reply count: "+count);
+
+    if (count>0) //  댓글이 있는 경우
+        replyRepository.deleteByBoard_Bno(bno);
+    // --------------------------------------------------------------  //
+
+    // 게시물 삭제 => 영속성의 전이 => (부모엔티티 삭제시, 자식엔티티 삭제됨)
+    // cascade = {CascadeType.ALL}
     boardRepository.deleteById(bno);
   }
 
@@ -125,7 +157,38 @@ public class BoardServiceImpl implements BoardService {
 
   // 게시글의 이미지와 댓글의 숫자 처리기능 구현
   @Override
-  public PageResponseDTO<BoardListAllDTO> listWithAll(PageResponseDTO pageResponseDTO) {
-    return null;
+  public PageResponseDTO<BoardListAllDTO> listWithAll(PageRequestDTO pageRequestDTO) {
+
+    String[] types = pageRequestDTO.getTypes();     // 검색 타입(글제목, 글내용, 작성자)
+    String keyword = pageRequestDTO.getKeyword();   // 검색 키워드
+    Pageable pageable = pageRequestDTO.getPageable("bno");
+
+    // BoardSearch클래스로 부터 상속받은 boardRepository는 searchWithAll()사용 가능
+    Page<BoardListAllDTO> result = boardRepository.searchWithAll(types, keyword, pageable);
+
+    return PageResponseDTO.<BoardListAllDTO>withAll()
+        .pageRequestDTO(pageRequestDTO)
+        .dtoList(result.getContent())
+        .total((int)result.getTotalElements())
+        .build();
+
+
+
+
+
+
+
+//    String[] types = pageRequestDTO.getTypes();
+//    String keyword = pageRequestDTO.getKeyword();
+//    Pageable pageable = pageRequestDTO.getPageable("bno");
+//
+//    Page<BoardListAllDTO> result = boardRepository.searchWithAll(types, keyword, pageable);
+//
+//    return PageResponseDTO.<BoardListAllDTO>withAll()
+//        .pageRequestDTO(pageRequestDTO)
+//        .dtoList(result.getContent())
+//        .total((int)result.getTotalElements())
+//        .build();
+
   }
 }
