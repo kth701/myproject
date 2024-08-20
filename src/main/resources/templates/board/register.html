@@ -37,35 +37,53 @@
             <label for="content" >Comments</label>
 
           </div>
-          <!-- 3. 게시글 작성자 -->
-          <div class="form-floating mb-3">
-            <!-- 로그인 미적용
-            <input type="text" class="form-control"
-                   placeholder="반드시 내용이 입력되어야 합니다."
-                   id="writer"
-                   name="writer" />    -->
+          <!-- 작성자, 이메일 -->
+          <div class="row mb-3">
+            <!-- 3. 게시글 작성자 -->
+            <div class="form-floating  col-6">
+              <!-- 로그인 미적용
+              <input type="text" class="form-control"
+                     placeholder="반드시 내용이 입력되어야 합니다."
+                     id="writer"
+                     name="writer" />    -->
 
-            <!-- 로그인 상태일 경우만 #authentication객체변수 적용  -->
-            <input type="text" class="form-control"
-                   placeholder="반드시 내용이 입력되어야 합니다."
-                   id="writer"
-                   name="writer"
-                   sec:authorize="isAuthenticated()"
-                   th:value="${#authentication.principal.name}" readonly
-                   />
-            <label for="writer">Writer</label>
+              <!-- 로그인 상태일 경우만 #authentication객체변수 적용  -->
+              <input type="text" class="form-control"
+                     placeholder="반드시 내용이 입력되어야 합니다."
+                     id="writer"
+                     name="writer"
+                     sec:authorize="isAuthenticated()"
+                     th:value="${#authentication.principal.name}" readonly
+                     />
+              <label for="writer" >Writer</label>
+            </div>
+
+            <!-- 4. 게시글 작성자 이메일
+             현재 로그인 사용자와 게시글 작성자가 동일한 판별하기위한 항목 -->
+            <div class="form-floating  col-6">
+              <!-- 로그인 상태일 경우만 #authentication객체변수 적용  -->
+              <input type="hiddien" class="form-control"
+                     id="email"
+                     name="email"
+                     sec:authorize="isAuthenticated()"
+                     th:value="${#authentication.principal.email}" readonly
+              />
+              <label for="email">Email</label>
+            </div>
           </div>
 
-          <!-- 4. 게시글 작성자 이메일
-           현재 로그인 사용자와 게시글 작성자가 동일한 판별하기위한 항목 -->
-          <div class="form-floating mb-3">
-            <!-- 로그인 상태일 경우만 #authentication객체변수 적용  -->
-            <input type="hiddien" class="form-control"
-                   name="emal"
-                   sec:authorize="isAuthenticated()"
-                   th:value="${#authentication.principal.email}" readonly
-            />
+          <!-- 첨부 파일 -->
+          <div class="input-group mb-3">
+            <label class="input-group-text">Images</label>
+            <div class="form-floating uploadHidden"  >
+                <button type="button"  class="btn btn-primary px-3 uploadFileBtn">Add Files</button>
+            </div>
           </div>
+          <!--
+          <div class="input-group mb-3">
+            <input type="file" name="file" class="form-control" multiple />
+          </div> -->
+
 
           <!-- 5. 글 보내기 버튼 -->
           <div class="my-4">
@@ -80,6 +98,43 @@
 
     </div>
 
+
+  <!-- 첨부파일 관련 UI -->
+  <!-- 1. 첨부파일 섬네일 view -->
+  <div class="row mt-3">
+    <div class="col">
+      <div class="container-fluid d-flex uploadResult" style=""></div>
+    </div>
+  </div>
+
+  <!-- 2. 첨부파일 추가를 위한 모달창 -->
+  <div>
+    <div class="modal uploadModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Upload File</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="input-group mb-3">
+              <input type="file" name="files" class="form-control" multiple />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn  btn-secondary uploadBtn">Upload</button>
+            <button type="button" class="btn btn-outline-dark closeUploadBtn">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- axios라이브러리 연결 -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <!-- file upload 처리하는 javascript 연결 -->
+  <script src="/js/upload.js"></script>
 </div>
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
@@ -112,7 +167,7 @@
     e.preventDefault(); // submit()기본 기능 제거
 
     if (title.value.length < 1 || title.value == ""){
-      alert("글제목이 비어 있습니다.");
+      alert("글제목 비어 있습니다.");
       title.focus();
       return;
     }
@@ -128,6 +183,128 @@
 
 
   });
+
+  // 업로드 모달
+  const uploadModal = new bootstrap.Modal(document.querySelector('.uploadModal'))
+
+  // 1. 업로드 모달에서 업로드버튼 클릭
+  document.querySelector(".uploadFileBtn").addEventListener('click',function(e){
+    e.stopPropagation()
+    e.preventDefault()
+
+     uploadModal.show();// 모달창 표시
+
+  })
+
+  // 2. 업로드 모달에서 Close버튼 클릭
+  document.querySelector(".closeUploadBtn").addEventListener('click',function(e){
+    e.stopPropagation()
+    e.preventDefault()
+
+     uploadModal.hide();// 모달창 숨기기
+
+  })
+
+  // 3.  업로드 모달에서 uploadBtn 버튼 클릭
+  document.querySelector(".uploadBtn").addEventListener('click',function(e){
+    e.stopPropagation()
+    e.preventDefault()
+
+    const formObj = new FormData()
+    const fileInput = document.querySelector("input[name='files']")
+    //console.log(fileInput.files)
+
+    const files = fileInput.files
+    for (let i=0; i<files.length; i++){
+      // javascript FormData객체를 이용해서 정보를 추가
+      formObj.append("files", files[i])
+    }
+
+    console.log('formObj:', formObj)
+
+    // 업로드 처리하는 함수 호출: axios요청
+    uploadToServer(formObj).then( result => {
+      console.log("업로드 정상처리 응답결과:"+result.data)
+
+      // 업로드된 결과를 JSON파일로 view 함수 호출
+      for (const uploadResult of result){
+        showUploadFile(uploadResult)
+      }
+
+      uploadModal.hide() // 모달창 숨기기
+    }).catch( e => {
+      console.log('업로드 실패=>', e)
+      uploadModal.hide()
+    })
+
+  })
+
+  //  업로드된 결과값을 view해서 보여줄  태그 요소 추출
+  const uploadResult = document.querySelector('.uploadResult');
+
+  // 업로드된 결과 view함수 정의
+  function showUploadFile({uuid, fileName, img, link}){
+    // 서버에 보내준 data : UploadResultDTO.uuid, xxx.fileName, xxx.img, xxx.getLink()구조 객체 => JSON변환(객체.속성,... 객체.메서드)
+    // 서버로 부터 넘겨받은 객체.속성 : xxx.uuid, xxx.fileName,  xxx.img
+    // 서버로 부터 넘겨받은 객체.메서드 :  xxx.Link() => Link메서드이름으로 데이터 보관된 상태이므로 함수명으로 데이터 읽기가능
+    console.log("file name:",fileName)
+    console.log("uuid:",uuid)
+    console.log("link:",link) // link는 Link()을 실행하여 결과값을 출력
+    console.log("img:",img)
+
+     const str =
+     `
+      <div class="card" style="width: 18rem;">
+        <div class="card-header">
+          <button class="btn-sm btn-danger  px-1"
+                  onClick="javascript:removeFile('${uuid}', '${fileName}', this)">X</button>
+        </div>
+        <div class="card-body">
+            <img src="/view/${link}" data-src="${uuid+"_"+fileName}" />
+        </div>
+      </div>
+     `
+
+     // 문자열 => DOM으로 변환 =>  '.uploadResult' 요소 하위요소 입력
+     uploadResult.innerHTML += str
+
+  }
+  // 첨부파일 삭제
+  function removeFile(uuid, fileName, obj){
+   console.log(uuid)
+   console.log(fileName)
+   console.log(obj)
+
+   const targetDiv = obj.closet(".card")
+
+   // 파일 삭제 요청 : axios
+   removeFileToServer(uuid, fileName).then(data => {
+    targetDive.remove()
+   })
+
+  }
+
+
+  // 게시물 등록
+  document.querySelector('.submitBtn').addEventListener('click', function(e){
+    e.stopPropagation()
+    e.preventDefault()
+
+    const target = document.querySelector('.uploadHidden')
+    const uploadFiles = uploadResult.querySelectorAll('img')
+
+    let str = ""
+    for (let i=0; i<uploadFiles.length; i++){
+      const uploadFile = uploadFiles[i]
+      const imgLink = uploadFile.getAttribute('src')
+
+      str += `<input type='hidden' name='filenames' value="${imgLink}">`
+    }// end for
+    target.innerHTML = str;
+
+    //document.querySelector('form').submit();
+  })
+
 
 
 
