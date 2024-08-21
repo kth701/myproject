@@ -102,11 +102,83 @@
 
     </div>
 
+
+    <!-- 첨부파일 관련 UI -->
+    <!-- 1. 첨부파일 섬네일 view -->
+    <div class="row mt-3">
+      <div class="col">
+
+        <div class="container-fluid d-flex uploadResult"
+             style="flex-wrap: wrap">
+          <!-- [[${dto.fileNames}]] -->
+
+          <!-- 기존에 이미지 첨부파일 View: fileName문자열구성 => uuid+"_"+파일이름.확장자   -->
+          <th:block th:each="fileName:${dto.fileNames}">
+          <div th:with="arr=${fileName.split('_')}"
+               class="card" style="width: 18rem;">
+
+            <div class="card-header d-flex justify-content-between">
+              <div>[[${arr[1]}]]</div>
+              <div>
+                <button class="btn-sm btn-danger  px-2"
+                        th:onClick="removeFile([[${arr[0]}]], [[${arr[1]}]], this)">X</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <!-- 섬네일 이미지 파일 view -->
+              <img th:src="|/view/s_${fileName}|" th:data-src="${fileName}" />
+              <!-- 원본 이미지 view
+              <img th:src="|/view/${fileName}|" th:data-src="${fileName}" />
+              -->
+            </div>
+
+          </div>
+          </th:block>
+          <!-- ------------------------------------------ -->
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 첨부파일 추가를 위한 모달창 -->
+    <div>
+      <div class="modal uploadModal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Upload File</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="input-group mb-3">
+                <input type="file" name="files" id="files" class="form-control"  multiple />
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn  btn-secondary uploadBtn">Upload</button>
+              <button type="button" class="btn btn-outline-dark closeUploadBtn">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  <!-- axios라이브러리 연결 -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <!-- file upload 처리하는 javascript 연결 -->
+  <script src="/js/upload.js"></script>
 </div>
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
 <style layout:fragment="mystyle" th:inline="css">
-
+  .uploadResult > .card {
+    margin-right: 0.3em;
+    margin-bottom: 0.3em;
+  }
+ .uploadResult > .card:last-child {
+    margin-right: 0;
+  }
 
 </style>
 
@@ -179,6 +251,38 @@
   });
 
 
+
+// ------------------------------------------------  //
+//  게시글 삭제작업에서 첨부파일 [X]버튼으로 삭제시:
+//  이미지를 화면에 보지않도록 제거 , 업로된 파일 삭제하지 않음
+// -----------------------------------------------  //
+// 실제 수정작업 진행시 삭제될 파일 목록 저장
+const removeFileList = [] // 배열객체 선언
+
+function removeFile(uuid,fileName, obj){
+
+    // 삭제할 파일목록 저장
+    if(!confirm("파일을 삭제하시겠습니까?")){
+        return
+    }
+
+    console.log(uuid)
+    console.log(fileName)
+    console.log(obj)
+
+    // 삭제할 파일목록 저장
+    removeFileList.push({uuid,fileName})
+    console.log('화면에서만 삭제한 이미지파일:', removeFileList)
+
+    // 요소.closest('선택요소') : 요소기준으로 상위요소중 가장가까운 요소 선택
+    // 현재요소에서 상위(부모)요소 찾을 경우 적용
+
+    // 자바스크립트 요소제거 : remove() removeChild()
+    // '.card' 요소제거: 썸네일 이미지 화면에서 삭제
+    const targetDiv = obj.closest(".card")
+    targetDiv.remove()
+
+}
 
 
 </script>

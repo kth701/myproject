@@ -110,6 +110,17 @@
         </form>
       </div>
 
+
+      <!-- 첨부된 이미지 view -->
+      <div class="col">
+        <!-- 3. 게시글에 대한 이미지 첨부파일 -->
+        <div class="py-2 thumbnail " th:if="${dto.fileNames != null && dto.fileNames.size() > 0}" >
+          <img class="img-thumbnail"
+               th:each="fileName: ${dto.fileNames}"
+               th:src="|/view/${fileName}|" />
+        </div>
+      </div>
+
     </div>
   <!-- --------------------------------------------------------------------  -->
 
@@ -239,6 +250,13 @@
 <style layout:fragment="mystyle" th:inline="css">
   .mylink {
     cursor: pointer;
+  }
+  .thumbnail > img {
+    margin-right: 0.2em;
+    margin-bottom: 0.2em;
+  }
+  .thumbnail > img:last-child {
+    margin-right: 0; margin-bottom: 0;
   }
 
 </style>

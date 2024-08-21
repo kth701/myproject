@@ -129,8 +129,6 @@
                 <a class="page-link"  th:data-num="${responseDTO.end+1}">다음</a>
               </li>
 
-
-
             </ul>
           </nav>
         </div>
@@ -164,8 +162,13 @@
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
 <style layout:fragment="mystyle" th:inline="css">
-  .thumbnail > img { margin-right: 0.2em;}
-  .thumbnail > img:last-child { margin-right: 0;}
+  .thumbnail > img {
+    margin-right: 0.2em;
+    margin-bottom: 0.2em;
+  }
+  .thumbnail > img:last-child {
+    margin-right: 0; margin-bottom: 0;
+    }
 </style>
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
