@@ -75,7 +75,7 @@
           <!-- 첨부 파일 -->
           <div class="input-group mb-3">
             <label class="input-group-text">Images</label>
-            <div class="form-floating uploadHidden"  >
+            <div class="form-floating uploadHidden">
                 <button type="button"  class="btn btn-primary px-3 uploadFileBtn">Add Files</button>
             </div>
           </div>
@@ -103,7 +103,7 @@
   <!-- 1. 첨부파일 섬네일 view -->
   <div class="row mt-3">
     <div class="col">
-      <div class="container-fluid d-flex uploadResult" style=""></div>
+      <div class="container-fluid d-flex uploadResult" style="flex-wrap: wrap"></div>
     </div>
   </div>
 
@@ -118,7 +118,7 @@
           </div>
           <div class="modal-body">
             <div class="input-group mb-3">
-              <input type="file" name="files" class="form-control" multiple />
+              <input type="file" name="files" id="files" class="form-control"  multiple />
             </div>
           </div>
           <div class="modal-footer">
@@ -139,7 +139,13 @@
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
 <style layout:fragment="mystyle" th:inline="css">
-
+  .uploadResult > .card {
+    margin-right: 0.3em;
+    margin-bottom: 0.3em;
+  }
+ .uploadResult > .card:last-child {
+    margin-right: 0;
+  }
 </style>
 
 <!-- 현재 페이지에서만 사용하는 css 정의 -->
@@ -162,6 +168,7 @@
   const writer = document.querySelector('#writer');
 
   // 클라이언트에서 먼저 입력항목에 대한 유효성 검사 처리
+  /*
   document.querySelector('.submitBtn').addEventListener('click', function(e){
     e.stopPropagation();
     e.preventDefault(); // submit()기본 기능 제거
@@ -177,17 +184,18 @@
         return;
     }
 
-
     // 값에 이상이 없으면 서버에 전송
     formObj.submit();
-
-
   });
+  */
 
+
+  // --------------------------------------------------------------------------------//
   // 업로드 모달
+  // --------------------------------------------------------------------------------//
   const uploadModal = new bootstrap.Modal(document.querySelector('.uploadModal'))
 
-  // 1. 업로드 모달에서 업로드버튼 클릭
+  // 1. [Add Files]버튼 클릭하면 모달창 띄우기
   document.querySelector(".uploadFileBtn").addEventListener('click',function(e){
     e.stopPropagation()
     e.preventDefault()
@@ -205,22 +213,22 @@
 
   })
 
-  // 3.  업로드 모달에서 uploadBtn 버튼 클릭
+  // 3.  업로드 모달에서 uploadBtn 버튼 클릭: 선택한 파일을 서버에 업로드처리
   document.querySelector(".uploadBtn").addEventListener('click',function(e){
     e.stopPropagation()
     e.preventDefault()
 
+    // 자바스크립트 FormData객체를 이용하여 전송할 파일을 저장(보관)
     const formObj = new FormData()
     const fileInput = document.querySelector("input[name='files']")
-    //console.log(fileInput.files)
+    // 또는 const fileInput = document.querySelector("#files")
+    //console.log(fileInput.files)// 선택된 파일이름이 <input type="file" name="files" />요소에 배열구조로 저장
 
     const files = fileInput.files
     for (let i=0; i<files.length; i++){
-      // javascript FormData객체를 이용해서 정보를 추가
-      formObj.append("files", files[i])
+      // "files"키이름은 서버에 받을 UploadFileDTO객체속성중에서 files과 동일한 속성명이면 1:1자동 맵핑
+      formObj.append("files", files[i])   // javascript FormData객체를 이용해서 정보를 추가
     }
-
-    console.log('formObj:', formObj)
 
     // 업로드 처리하는 함수 호출: axios요청
     uploadToServer(formObj).then( result => {
@@ -242,7 +250,8 @@
   //  업로드된 결과값을 view해서 보여줄  태그 요소 추출
   const uploadResult = document.querySelector('.uploadResult');
 
-  // 업로드된 결과 view함수 정의
+  // 업로드된 결과 view함수 정의:
+  // UpDownController->"/upload"처리후 -> 서버에서 보낸 객체정보(UploadResultDTO)을 받음)
   function showUploadFile({uuid, fileName, img, link}){
     // 서버에 보내준 data : UploadResultDTO.uuid, xxx.fileName, xxx.img, xxx.getLink()구조 객체 => JSON변환(객체.속성,... 객체.메서드)
     // 서버로 부터 넘겨받은 객체.속성 : xxx.uuid, xxx.fileName,  xxx.img
@@ -252,12 +261,16 @@
     console.log("link:",link) // link는 Link()을 실행하여 결과값을 출력
     console.log("img:",img)
 
+    // 문자열와 변수 같이 사용시 => "name:"+fileName => `name:${fileName}`
      const str =
      `
       <div class="card" style="width: 18rem;">
-        <div class="card-header">
-          <button class="btn-sm btn-danger  px-1"
-                  onClick="javascript:removeFile('${uuid}', '${fileName}', this)">X</button>
+        <div class="card-header d-flex justify-content-between">
+          <div>${fileName}</div>
+          <div>
+            <button class="btn-sm btn-danger  px-2"
+                    onClick="javascript:removeFile('${uuid}', '${fileName}', this)">X</button>
+          </div>
         </div>
         <div class="card-body">
             <img src="/view/${link}" data-src="${uuid+"_"+fileName}" />
@@ -269,40 +282,79 @@
      uploadResult.innerHTML += str
 
   }
+
+  // --------------------------  //
   // 첨부파일 삭제
+  // --------------------------  //
   function removeFile(uuid, fileName, obj){
    console.log(uuid)
    console.log(fileName)
-   console.log(obj)
+   console.log(obj)   //  현재 버튼요소을 지칭
 
-   const targetDiv = obj.closet(".card")
+   // 요소.closest('선택요소') : 요소기준으로 상위요소중 가장가까운 요소 선택
+   // 현재요소에서 상위(부모)요소 찾을 경우 적용
+   const targetDiv = obj.closest(".card")
 
-   // 파일 삭제 요청 : axios
-   removeFileToServer(uuid, fileName).then(data => {
-    targetDive.remove()
+   // 파일 삭제 요청 : axios()
+   removeFileToServer(uuid, fileName).then(remove => {
+       // 서버로 부터 받은 객체정보: 정상적으로 삭제되었으면 HashMap형식으로 객체전달
+       // HashMap('result': true)
+       console.log(remove)  // HashMap객체 => remove JSON객체로 받음
+       console.log(remove.result)
+
+      // 자바스크립트 요소제거 : remove() removeChild()
+      // '.card' 요소제거: 썸네일 이미지 화면에서 삭제
+      if(remove.result) targetDiv.remove()
    })
 
   }
 
 
-  // 게시물 등록
+  // --------------------------------------------------------------------------- //
+  // 게시물 등록 : 게시글 정보, 첨부파일이름 DB에 저장 요청
+  // ---------------------------------------------------------------------------- //
   document.querySelector('.submitBtn').addEventListener('click', function(e){
     e.stopPropagation()
     e.preventDefault()
 
-    const target = document.querySelector('.uploadHidden')
-    const uploadFiles = uploadResult.querySelectorAll('img')
+    // 유효성 검사
+    if (title.value.length < 1 || title.value == ""){
+      alert("글제목 비어 있습니다.");
+      title.focus();
+      return;
+    }
+    if ( title.value.length < 3 || title.value.length > 100) {
+        alert("3자 이상 100자 이내에서만 작성 가능합니다.");
+        title.focus();
+        return;
+    }
+
+
+    // 이미지 첨부파일 처리
+    const target = document.querySelector('.uploadHidden')    // Add Files버튼(모달창 호출 버튼)
+    const uploadFiles = uploadResult.querySelectorAll('img')  // 이미지 첨부파일 있을 경우(업로드 처리후 img태그요소)
 
     let str = ""
-    for (let i=0; i<uploadFiles.length; i++){
-      const uploadFile = uploadFiles[i]
-      const imgLink = uploadFile.getAttribute('src')
+    for (let i=0; i<uploadFiles.length; i++){ // 이미지 첨부파일이 1개이상일 경우
+      const uploadFile = uploadFiles[i]       // img태그 배열
+      const imgLink = uploadFile.getAttribute('data-src')
 
-      str += `<input type='hidden' name='filenames' value="${imgLink}">`
+      // 이미지 파일 이름을 hideen input요소에 저장
+      str += `<input type='hidden' name='fileNames' value="${imgLink}">`
+      //console.log("imges: "+ str);
+
     }// end for
-    target.innerHTML = str;
 
-    //document.querySelector('form').submit();
+    // [Add Files]버튼 =>  <input type='hidden' name="fileNames"/>요소 전환
+    target.innerHTML = str;
+    document.querySelector('form').submit();
+
+
+    /*
+    const formObj =  document.querySelector('form')
+    formObj.submit()
+    formObj.reset()
+    */
   })
 
 

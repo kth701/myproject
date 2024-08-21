@@ -1,10 +1,7 @@
 package com.spring.myproject.controller;
 
 
-import com.spring.myproject.dto.BoardDTO;
-import com.spring.myproject.dto.BoardListReplyCountDTO;
-import com.spring.myproject.dto.PageRequestDTO;
-import com.spring.myproject.dto.PageResponseDTO;
+import com.spring.myproject.dto.*;
 import com.spring.myproject.service.BoardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +37,10 @@ public class BoardController {
     //PageResponseDTO responseDTO = boardService.list(pageRequestDTO);
 
     // 1-2. 게시글 댓글 개수 있는 List 조회
-    PageResponseDTO<BoardListReplyCountDTO> responseDTO = boardService.listWithReplyCount(pageRequestDTO);
+    //PageResponseDTO<BoardListReplyCountDTO> responseDTO = boardService.listWithReplyCount(pageRequestDTO);
+
+    // 1-3. 게시글 댓글 개수 있는 List 조회
+    PageResponseDTO<BoardListAllDTO> responseDTO = boardService.listWithAll(pageRequestDTO);
     log.info("=> "+responseDTO);
 
     model.addAttribute("responseDTO", responseDTO);

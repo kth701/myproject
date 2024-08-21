@@ -15,7 +15,7 @@ import java.util.List;
 public class BoardListAllDTO {
   private Long bno;
   private String title;
-  private String write;
+  private String writer;
   private String email;
   private LocalDateTime regDate;
 

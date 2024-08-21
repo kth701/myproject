@@ -289,7 +289,7 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
           // 1. board entity -> board dto
           .bno(board1.getBno())
           .title(board1.getTitle())
-          .write(board1.getWriter())
+          .writer(board1.getWriter())
           .email(board1.getEmail())
           .regDate(board1.getRegDate())
           .replyCount(replyCount)   //  2. reply count -> replycount dto

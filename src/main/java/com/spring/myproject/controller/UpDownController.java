@@ -12,10 +12,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -103,6 +100,7 @@ public class UpDownController {
   @GetMapping(value="/view/{fileName}")
   public ResponseEntity<Resource> viewFileGET(@PathVariable String fileName){
     Resource resource = new FileSystemResource(uploadPath+File.separator+fileName);
+    // uploadPath("C:\\javaStudy\\upload") + File.separator("\\") + fileName("a.jpg")
     String resourceName = resource.getFilename();
 
     HttpHeaders headers = new HttpHeaders();
@@ -118,11 +116,10 @@ public class UpDownController {
 
   // file remove:  첨부파일 삭제
   @Operation(summary="remove 파일", description="DELETE방식으로 첨부파일 삭제")
-  @GetMapping(value="/remove/{fileName}")
+  @DeleteMapping(value="/remove/{fileName}")      //@GetMapping(value="/remove/{fileName}") // test
   public Map<String, Boolean> removeFile(@PathVariable String fileName){
-
     Resource resource = new FileSystemResource(uploadPath+File.separator+fileName);
-    // "C:\\javaStudy\\upload" + "\\" + "a.jpg"
+    // uploadPath("C:\\javaStudy\\upload") + File.separator("\\") + fileName("a.jpg")
     String resourceName = resource.getFilename();
 
     Map<String, Boolean> resultMap = new HashMap<>();
@@ -143,6 +140,7 @@ public class UpDownController {
       log.error(e.getMessage());
     }
 
+    // 삭제후 응답할 정보
     resultMap.put("result", removed);
     return resultMap;
   }
