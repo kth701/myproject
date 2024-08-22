@@ -229,7 +229,7 @@
 
 
   // 1. Modify 버튼 기능 처리
-  document.querySelector('.`modBtn`').addEventListener('click', function(e){
+  document.querySelector('.modBtn').addEventListener('click', function(e){
     e.stopPropagation();// 현재 요소의 이벤트발생을 상위요소에서 이벤트 감지 하지 않게 기능
     e.preventDefault(); // 기본 기능 제거
     console.log("modify")
@@ -319,7 +319,7 @@
   // -------------------------------------------------------- //
 
 
-  document.querySelector('.`removeBtn`').addEventListener('click', function(e){
+  document.querySelector('.removeBtn').addEventListener('click', function(e){
     e.stopPropagation();
     e.preventDefault(); // 기본 기능 제거
     console.log("remove")
@@ -392,7 +392,11 @@
   // 실제 수정작업 진행시 삭제될 파일 목록 저장
   // [10,20.'hong'], [{10,20},{'hong','kim'}]
 
-  const removeFileList = [] // 배열객체 선언
+
+  // const removeFileList = [] // register.html에서 게시글 등록시 첨부파일 목록 저장 1번만 수행
+  // 삭제할 첨부파일 목록 저장하는 전역배열객체 선언
+  // 삭제작업, 수정작업에서 각각 목록을 clear한후 사용 : cont 대신 var로 선언
+  var removeFileList = []
 
   // 삭제할 첨부파일 목록 저장 및 화면에서 제거
   function removeFile(uuid,fileName, obj){
