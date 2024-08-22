@@ -45,56 +45,74 @@
             <label for="content" >Comments</label>
 
           </div>
-          <!-- 3. 게시글 작성자 -->
-          <div class="form-floating mb-3">
-            <input type="text" class="form-control"
-                   id="writer"
-                   name="writer" th:value="${dto.writer}" readonly
-                   placeholder="반드시 내용이 입력되어야 합니다." >
-            <label for="writer">Writer</label>
+
+          <!-- 작성자,  이메일 1행 2열로 재배치 -->
+          <div class="row">
+            <!-- 3. 게시글 작성자 -->
+            <div class="form-floating mb-3 col-6">
+              <input type="text" class="form-control"
+                     id="writer"
+                     name="writer" th:value="${dto.writer}" readonly
+                     >
+              <label for="writer">Writer</label>
+            </div>
+
+            <!-- 4. 게시글 이미지 첨부파일
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control"
+                     id="writer"
+                     name="writer" th:value="${dto.writer}" readonly
+                     placeholder="반드시 내용이 입력되어야 합니다." >
+              <label for="writer">Writer</label>
+            </div>    -->
+
+            <!-- 5. 게시글 작성자 이메일
+             현재 로그인 사용자와 게시글 작성자가 동일한 판별하기위한 항목 -->
+            <div class="form-floating mb-3 col-6">
+              <!-- 로그인 상태일 경우만 #authentication객체변수 적용  -->
+              <input type="email" class="form-control"
+                     id="email"
+                     name="email"
+                     th:value="${dto.email}" readonly  />
+              <label for="email">Email</label>
+            </div>
+
           </div>
 
-          <!-- 4. 게시글 이미지 첨부파일 -->
-<!--          <div class="form-floating mb-3">-->
-<!--            <input type="text" class="form-control"-->
-<!--                   id="writer"-->
-<!--                   name="writer" th:value="${dto.writer}" readonly-->
-<!--                   placeholder="반드시 내용이 입력되어야 합니다." >-->
-<!--            <label for="writer">Writer</label>-->
-<!--          </div>     -->
 
-          <!-- 5. 게시글 작성자 이메일
-           현재 로그인 사용자와 게시글 작성자가 동일한 판별하기위한 항목 -->
-          <div class="form-floating mb-3">
-            <!-- 로그인 상태일 경우만 #authentication객체변수 적용  -->
-            <input type="email" class="form-control"
-                   id="email"
-                   name="email"
-                   th:value="${dto.email}" readonly  />
-            <label for="writer">Email</label>
-          </div>
 
-          <!-- 6. 게시글 등록일, 수정일 -->
-          <div class="form-floating mb-3">
-            <input type="text" class="form-control"
-                   id="regDate"
-                   th:value="${#temporals.format(dto.regDate, 'yyyy-MM-dd HH:mm:ss')}" readonly
-                   >
-            <label for="regDate">RegDate</label>
-          </div>
-          <div class="form-floating mb-3">
-            <input type="text" class="form-control"
-                   id="modDate"
-                   th:value="${#temporals.format(dto.modDate, 'yyyy-MM-dd HH:mm:ss')}" readonly
-                    >
-            <label for="modDate">ModDate</label>
+          <!--등록일, 수정일 1행 2열로 재배치 -->
+          <div class="row">
+            <!-- 6. 게시글 등록일, 수정일 -->
+            <div class="form-floating mb-3  col-6">
+              <input type="text" class="form-control"
+                     id="regDate"
+                     th:value="${#temporals.format(dto.regDate, 'yyyy-MM-dd HH:mm:ss')}" readonly
+                     >
+              <label for="regDate">RegDate</label>
+            </div>
+            <div class="form-floating mb-3 col-6">
+              <input type="text" class="form-control"
+                     id="modDate"
+                     th:value="${#temporals.format(dto.modDate, 'yyyy-MM-dd HH:mm:ss')}" readonly
+                      >
+              <label for="modDate">ModDate</label>
+            </div>
           </div>
 
           <!-- 4. List, Modify 버튼-->
           <div class="my-4">
             <button type="button" class="btn btn-primary   listBtn">List</button>
-            <button type="button" class="btn btn-secondary modBtn" >Save</button>
+            <button type="button" class="btn btn-secondary modBtn" >Modify Finish</button>
             <button type="button" class="btn btn-danger    removeBtn" >Remove</button>
+          </div>
+
+          <!-- 7. 첨부 파일 버튼 -->
+          <div class="input-group mb-3  mt-3">
+            <label class="input-group-text">Images</label>
+            <div class="form-floating uploadHidden">
+              <button type="button"  class="btn btn-primary px-3 uploadFileBtn">Add Files</button>
+            </div>
           </div>
 
         </form>
@@ -103,13 +121,14 @@
     </div>
 
 
-    <!-- 첨부파일 관련 UI -->
+  <!-- 첨부파일 관련 UI -->
     <!-- 1. 첨부파일 섬네일 view -->
     <div class="row mt-3">
       <div class="col">
 
         <div class="container-fluid d-flex uploadResult"
              style="flex-wrap: wrap">
+
           <!-- [[${dto.fileNames}]] -->
 
           <!-- 기존에 이미지 첨부파일 View: fileName문자열구성 => uuid+"_"+파일이름.확장자   -->
@@ -140,7 +159,7 @@
       </div>
     </div>
 
-    <!-- 2. 첨부파일 추가를 위한 모달창 -->
+    <!-- 2. 첨부파일 추가를 위한 모달창  UI -->
     <div>
       <div class="modal uploadModal" tabindex="-1">
         <div class="modal-dialog">
@@ -151,7 +170,7 @@
             </div>
             <div class="modal-body">
               <div class="input-group mb-3">
-                <input type="file" name="files" id="files" class="form-control"  multiple />
+                <input type="file" name="files"  class="form-control"  multiple />
               </div>
             </div>
             <div class="modal-footer">
@@ -162,6 +181,8 @@
         </div>
       </div>
     </div>
+
+
 
 
   <!-- axios라이브러리 연결 -->
@@ -215,12 +236,83 @@
 
     // javascript에서 action, method 속성 변경: 페이징 정보 추가
     formObj.action = `/board/modify?${link}`
-    formObj.method = 'post';
-    formObj.submit();     // POST방식
+
+
+    // ------------------------ //
+    // 새로추가될 첨부파일
+    // ------------------------ //
+    appendFileData()
+
+    // ------------------------ //
+    // 삭제할 <첨부파일></첨부파일>
+    // ------------------------ //
+    callRemoveFiles()
+
+    // ------------------------ //
+    formObj.method = 'post';    // POST방식
+    formObj.submit();
+
+
 
     // Get방식(수정페이지요청)
     //self.location=`/board/modify?${link}`
   });
+
+  // ----------------------------------------------------------- //
+  // const uploadResult = document.querySelector('.uploadResult')
+  // ----------------------------------------------------------- //
+  function appendFileData(){
+    // 이미지 첨부파일 처리
+    const target = document.querySelector('.uploadHidden')    // Add Files버튼(모달창 호출 버튼)
+    const uploadFiles = uploadResult.querySelectorAll('img')  // 이미지 첨부파일 있을 경우(업로드 처리후 img태그요소)
+
+
+    console.log('.uploadHidden',target)
+    console.log('uploadFiles', uploadFiles)
+
+    let str = ""
+    for (let i=0; i<uploadFiles.length; i++){ // 이미지 첨부파일이 1개이상일 경우
+      const uploadFile = uploadFiles[i]       // img태그 배열
+      const imgLink = uploadFile.getAttribute('data-src')
+
+      // 이미지 파일 이름을 hideen input요소에 저장
+      str += `<input type='hidden' name='fileNames' value="${imgLink}">`
+      //console.log("imges: "+ str);
+
+    }// end for
+
+    // [Add Files]버튼 =>  <input type='hidden' name="fileNames"/>요소 전환
+    target.innerHTML = str;
+
+  }
+  // -------------------------------------------------------- //
+  function callRemoveFiles(){
+     // 삭제할 첨부파일 목록: [{xx.xx},...]
+     removeFileList.forEach( ({uuid, fileName}) => {
+        // 업로드파일 삭제 요청: axios
+        removeFileToServer({uuid, fileName})
+                .then(response => {
+                   // 삭제후 서버로부터 응답
+                   console.log(response)
+                })
+     })
+  }
+
+  // -------------------------------------------------------- //
+  function appendNotShownData(){    // [remove] 버튼 클릭시 첨부파일 관련 정보 삭제
+    // 삭제할 첨부파일 목록 => [X]버튼 클릭시 선택된 첨부파일이름
+    if (removeFileList.length == 0){ return  }
+
+    const target = document.querySelector('.uploadHidden')
+    let str = ''
+    for (let i=0; i<removeFileList.length; i++){
+      // const {a,b} = {10,20} => 구조분할할당
+      const {uuid, fileName} = removeFileList[i]  // removeFileList.push({uuid, fileName})
+      str += `<input type='hidden', name='fileNames' value="${uuid}_${fileName}">`
+    }
+    target.innerHTML += str;
+  }
+
 
   // 2. List 버튼 기능 처리
   document.querySelector('.listBtn').addEventListener('click', function(e){
@@ -252,37 +344,142 @@
 
 
 
-// ------------------------------------------------  //
-//  게시글 삭제작업에서 첨부파일 [X]버튼으로 삭제시:
-//  이미지를 화면에 보지않도록 제거 , 업로된 파일 삭제하지 않음
-// -----------------------------------------------  //
-// 실제 수정작업 진행시 삭제될 파일 목록 저장
-const removeFileList = [] // 배열객체 선언
+  // -----------첨부 파일 추가 이후 --------------------- //
+  // ------------------------------------------------  //
+  //  게시글 삭제작업에서 첨부파일 [X]버튼으로 삭제시:
+  //  이미지를 화면에 보지않도록 제거 , 업로된 파일 삭제하지 않음
+  // -----------------------------------------------  //
+  // 실제 수정작업 진행시 삭제될 파일 목록 저장
+  // [10,20.'hong'], [{10,20},{'hong','kim'}]
 
-function removeFile(uuid,fileName, obj){
+  const removeFileList = [] // 배열객체 선언
 
-    // 삭제할 파일목록 저장
-    if(!confirm("파일을 삭제하시겠습니까?")){
-        return
+  // 삭제할 첨부파일 목록 저장 및 화면에서 제거
+  function removeFile(uuid,fileName, obj){
+
+      // 삭제할 파일목록 저장
+      if(!confirm("파일을 삭제하시겠습니까?")){
+          return
+      }
+
+      console.log(uuid)
+      console.log(fileName)
+      console.log(obj)
+
+      // 삭제할 파일목록 저장
+      removeFileList.push({uuid,fileName})
+      console.log('화면에서만 삭제한 이미지파일:', removeFileList)
+
+      // 요소.closest('선택요소') : 요소기준으로 상위요소중 가장가까운 요소 선택
+      // 현재요소에서 상위(부모)요소 찾을 경우 적용
+
+      // 자바스크립트 요소제거 : remove() removeChild()
+      // '.card' 요소제거: 썸네일 이미지 화면에서 삭제
+      const targetDiv = obj.closest(".card")
+      targetDiv.remove()
+
+  }
+
+
+  // --------------------------------------------------------------------------------//
+  // [Add Files]클릭시 업로드 모달창 띄우기
+  // --------------------------------------------------------------------------------//
+  const uploadModal = new bootstrap.Modal(document.querySelector('.uploadModal'))
+
+  // 1. [Add Files]버튼 클릭하면 모달창 띄우기
+  document.querySelector(".uploadFileBtn").addEventListener('click',function(e){
+    e.stopPropagation()
+    e.preventDefault()
+
+     uploadModal.show();// 모달창 표시
+
+  })
+
+  // 2. 업로드 모달에서 Close버튼 클릭
+  document.querySelector(".closeUploadBtn").addEventListener('click',function(e){
+    e.stopPropagation()
+    e.preventDefault()
+
+     uploadModal.hide();// 모달창 숨기기
+
+  })
+
+
+  // 3.  업로드 모달에서 uploadBtn 버튼 클릭: 선택한 파일을 서버에 업로드처리
+  document.querySelector(".uploadBtn").addEventListener('click',function(e){
+    e.stopPropagation()
+    e.preventDefault()
+
+    // 자바스크립트 FormData객체를 이용하여 전송할 파일을 저장(보관)
+    const formObj = new FormData()
+    const fileInput = document.querySelector("input[name='files']")
+
+    const files = fileInput.files
+    for (let i=0; i<files.length; i++){       // "files"키이름은 서버에 받을 UploadFileDTO객체속성중에서 files과 동일한 속성명이면 1:1자동 맵핑
+      formObj.append("files", files[i])       // javascript FormData객체를 이용해서 정보를 추가
     }
 
-    console.log(uuid)
-    console.log(fileName)
-    console.log(obj)
+    // 업로드 처리하는 함수 호출: axios요청
+    uploadToServer(formObj).then( result => {
+      console.log("업로드 정상처리 응답결과:"+result.data)
 
-    // 삭제할 파일목록 저장
-    removeFileList.push({uuid,fileName})
-    console.log('화면에서만 삭제한 이미지파일:', removeFileList)
+      // 업로드된 결과를 JSON파일로 view 함수 호출
+      for (const uploadResult of result){
+        showUploadFile(uploadResult)
+      }
+      // 모달창 숨기기
+      uploadModal.hide()
+    }).catch( e => {
+      console.log('업로드 실패=>', e)
+      uploadModal.hide()
+    })
+  })  // end uploadToServer()
 
-    // 요소.closest('선택요소') : 요소기준으로 상위요소중 가장가까운 요소 선택
-    // 현재요소에서 상위(부모)요소 찾을 경우 적용
 
-    // 자바스크립트 요소제거 : remove() removeChild()
-    // '.card' 요소제거: 썸네일 이미지 화면에서 삭제
-    const targetDiv = obj.closest(".card")
-    targetDiv.remove()
+  //  4. 업로드된 결과값을 View해서 보여줄 태그 요소 추출
+  const uploadResult = document.querySelector('.uploadResult');
 
-}
+  // ------------------------------------- //
+  // 업로드된 결과 view함수 정의
+  // ------------------------------------- //
+  /*
+   UpDownController->"/upload"처리후 -> 서버에서 보낸 객체정보(UploadResultDTO)을 받음)
+   서버에 보내준 data : UploadResultDTO.uuid, xxx.fileName, xxx.img, xxx.getLink()구조 객체 => JSON변환(객체.속성,... 객체.메서드)
+   서버로 부터 넘겨받은 객체.속성 : xxx.uuid, xxx.fileName,  xxx.img
+   서버로 부터 넘겨받은 객체.메서드 :  xxx.Link() => Link메서드이름으로 데이터 보관된 상태이므로 함수명으로 데이터 읽기가능
+  */
+  // ------------------------------------- //
+
+  function showUploadFile({uuid, fileName, img, link}){
+
+    console.log("file name:",fileName)
+    console.log("uuid:",uuid)
+    console.log("link:",link) // link는 Link()을 실행하여 결과값을 출력
+    console.log("img:",img)
+
+    // 문자열와 변수 같이 사용시 => "name:"+fileName => `name:${fileName}`
+     const str =
+     `
+      <div class="card" style="width: 18rem;">
+        <div class="card-header d-flex justify-content-between">
+          <div>${fileName}</div>
+          <div>
+            <button class="btn-sm btn-danger  px-2"
+                    onClick="javascript:removeFile('${uuid}', '${fileName}', this)">X</button>
+          </div>
+        </div>
+        <div class="card-body">
+            <img src="/view/${link}" data-src="${uuid+"_"+fileName}" />
+        </div>
+      </div>
+     `
+
+     // 문자열 => DOM으로 변환 =>  '.uploadResult' 요소 하위요소 입력
+     uploadResult.innerHTML += str
+
+  }
+
+
 
 
 </script>

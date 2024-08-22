@@ -56,6 +56,7 @@ public interface BoardService {
         .bno(board.getBno())
         .title(board.getTitle())
         .email(board.getEmail())
+        .writer(board.getWriter())
         .content(board.getContent())
         .regDate(board.getRegDate())
         .modDate(board.getModDate())
