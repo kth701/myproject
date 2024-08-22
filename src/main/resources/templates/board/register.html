@@ -297,7 +297,7 @@
    const targetDiv = obj.closest(".card")
 
    // 파일 삭제 요청 : axios()
-   removeFileToServer(uuid, fileName).then(remove => {
+   removeFileToServer({uuid, fileName}).then(remove => {
        // 서버로 부터 받은 객체정보: 정상적으로 삭제되었으면 HashMap형식으로 객체전달
        // HashMap('result': true)
        console.log(remove)  // HashMap객체 => remove JSON객체로 받음

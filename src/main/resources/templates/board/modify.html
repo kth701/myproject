@@ -229,7 +229,7 @@
 
 
   // 1. Modify 버튼 기능 처리
-  document.querySelector('.modBtn').addEventListener('click', function(e){
+  document.querySelector('.`modBtn`').addEventListener('click', function(e){
     e.stopPropagation();// 현재 요소의 이벤트발생을 상위요소에서 이벤트 감지 하지 않게 기능
     e.preventDefault(); // 기본 기능 제거
     console.log("modify")
@@ -244,7 +244,7 @@
     appendFileData()
 
     // ------------------------ //
-    // 삭제할 <첨부파일></첨부파일>
+    // 업로된 첨부파일 삭제
     // ------------------------ //
     callRemoveFiles()
 
@@ -277,7 +277,7 @@
 
       // 이미지 파일 이름을 hideen input요소에 저장
       str += `<input type='hidden' name='fileNames' value="${imgLink}">`
-      //console.log("imges: "+ str);
+      //console.log("imges: "+ imgLink);`
 
     }// end for
 
@@ -289,6 +289,7 @@
   function callRemoveFiles(){
      // 삭제할 첨부파일 목록: [{xx.xx},...]
      removeFileList.forEach( ({uuid, fileName}) => {
+      console.log("callRemoveFiles: ",uuid, fileName)
         // 업로드파일 삭제 요청: axios
         removeFileToServer({uuid, fileName})
                 .then(response => {
@@ -297,6 +298,71 @@
                 })
      })
   }
+
+  // 2. List 버튼 기능 처리
+  document.querySelector('.listBtn').addEventListener('click', function(e){
+    e.stopPropagation();
+    e.preventDefault(); // 기본 기능 제거
+    console.log("list")
+
+    // 전송 기능
+    //formObj.submit();
+
+    // 리셋 기능(폼값 초기화)
+    //formObj.reset();
+
+    self.location=`/board/list?${link}`
+  });
+
+  // -------------------------------------------------------- //
+  // 3. Remove 버튼 기능 처리 => 특정 번호 게시글 삭제
+  // -------------------------------------------------------- //
+
+
+  document.querySelector('.`removeBtn`').addEventListener('click', function(e){
+    e.stopPropagation();
+    e.preventDefault(); // 기본 기능 제거
+    console.log("remove")
+
+
+    // 첨부파일 이미지 목록속성만 추출하여 삭제목록에 저장 => 전역배열 => removeFileList
+    const delFiles = [[${dto.fileNames}]]
+    if (delFiles.length > 0) {
+        console.log('delFiles', delFiles,[[${dto.fileNames}]])
+
+        for (fName of delFiles){
+          const arr = fName.split("_")
+          const uuid = arr[0]
+          const fileName = arr[1]
+
+          //console.log(uuid, fileName)
+          // 삭제할 첨부파일 목록에 저장된 => callRemoveFiles()메서드에서 삭제요청
+          // 구조분해할당형식의 값전달 시: 보내쪽과 받는쪽의 매개변수가 동일해야 함.
+          removeFileList.push({uuid,fileName})
+        }
+
+        //console.log("remove button :"+removeFileList)
+        //console.log("remove button :"+removeFileList[0])
+    }
+
+
+
+
+    // 1.첨부파일 추가  => 이미지첨부파일 form에 추가
+    appendFileData()
+    // 2. View 표시되지 않은 첨부파일(x버튼클릭시 화면에서 숨기기한 첨부파일 목록) form에 추가 => boardImage에 등록된 자료 삭제 요청
+    appendNotShownData()
+
+    // 3. 업로된 첨부파일 삭제: removeFileList객체에 있는 첨부파일 목록 읽어와 첨부파일삭제요청에 전달
+    callRemoveFiles()
+
+
+    // javascript에서 action, method 속성 변경
+    formObj.action = `/board/remove`
+    formObj.method = 'post';
+    formObj.submit();
+
+  });
 
   // -------------------------------------------------------- //
   function appendNotShownData(){    // [remove] 버튼 클릭시 첨부파일 관련 정보 삭제
@@ -314,33 +380,7 @@
   }
 
 
-  // 2. List 버튼 기능 처리
-  document.querySelector('.listBtn').addEventListener('click', function(e){
-    e.stopPropagation();
-    e.preventDefault(); // 기본 기능 제거
-    console.log("list")
 
-    // 전송 기능
-    //formObj.submit();
-
-    // 리셋 기능(폼값 초기화)
-    //formObj.reset();
-
-    self.location=`/board/list?${link}`
-  });
-
-  // 3. Remove 버튼 기능 처리
-  document.querySelector('.removeBtn').addEventListener('click', function(e){
-    e.stopPropagation();
-    e.preventDefault(); // 기본 기능 제거
-    console.log("remove")
-
-    // javascript에서 action, method 속성 변경
-    formObj.action = `/board/remove`
-    formObj.method = 'post';
-    formObj.submit();
-
-  });
 
 
 
