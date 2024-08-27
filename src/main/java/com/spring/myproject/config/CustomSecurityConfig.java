@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -76,8 +78,12 @@ public class CustomSecurityConfig {
 //        .rememberMe( rememberMe -> rememberMe.tokenValiditySeconds(10));
 
 
+
+    //--------------------- //
     // 2. 인증 과정 처리
+    //--------------------- //
     // 2.1 로그인 관련 설정 => UserDetailsSeervice인터페이스 구현 후 설정 할 것
+
     http.csrf(AbstractHttpConfigurer::disable)
         .formLogin(login -> {
                     login.loginPage("/members/login")             // 로그인 처리할 url 설정
@@ -105,20 +111,30 @@ public class CustomSecurityConfig {
                           });
                     });
 
+    //--------------------- //
     // 3. 접근 권한 설정
+    //--------------------- //
     // SpringBoot 3v 변경된 코드 확인
     // 변경전 : authorizeRequests() → 변경후 : authorizeHttpRequests()
     // http.authorizeRequests().anyRequest().authenticated();
     // -> http.authorizeHttpRequests().anyRequest().authenticated();
 
-    /* 정적 자원 경로  접근제한 되어 있는 static폴더가 인식 안될 경우
-    * - 1. WebSecurityCustomizer Bean등록 (아래부분)
-    * - 2. WebMvcConfigurer인터페이스를 구현한 config폴더에서 CustomServletConfig클래스에서 경로 재설정 시킴
-    * */
+    //-------------------------------------------------------- //
+    // 정적 자원 경로  접근제한 되어 있는 static폴더가 인식 안될 경우
+    //  - 1. WebSecurityCustomizer Bean등록 (아래부분)
+    //  - 2. WebMvcConfigurer인터페이스를 구현한 config폴더에서 CustomServletConfig클래스에서 경로 재설정 시킴
+    //-------------------------------------------------------- //
+
     http.authorizeHttpRequests( auth -> {
         // 사용자 인증없이 접근할 수 있도록 설정
-        auth.requestMatchers("/","/members/**").permitAll();
-        // ADMIN Role일 경우에만 접근
+        auth.requestMatchers("/","/members/**","/swagger-ui/**", "/test/**").permitAll();
+
+        // ---------------------------------------------------- //
+        // 1. h2설정 => h2-console 관련 URL에 대해 인증을 면제
+        // ---------------------------------------------------- //
+        //auth.requestMatchers(PathRequest.toH2Console()).permitAll();
+
+        // USER Role일 경우에만 접근
         auth.requestMatchers("/board/**").hasRole("USER");
         // ADMIN Role일 경우에만 접근
         auth.requestMatchers("/admin/**").hasRole("ADMIN");
@@ -128,21 +144,38 @@ public class CustomSecurityConfig {
         //auth.anyRequest().permitAll();
     });
 
+    // ---------------------------------------------------------------------- //
+    // 2. h2설정 => H2 웹콘솔의 iframe이 정상적으로 작동하려면 Origin에 대해 허용하도록 설정
+    // ---------------------------------------------------------------------- //
+    /*
+      - Spring Security는 CsrfFilter를 기본적으로 Default Filter로 설정하고 있다.
+      - CsrfFilter가 H2 웹콘솔 관련 경로를 무시하도록 설정
+      - Spring Security는 기본적으로 HeaderWriterFilter를 활성화.
+        HeaderWriterFilter는 XFrameOptionsHeaderWriter를 이용해 설정에 따라
+        X-Frame-Options헤더에 DENY, SAMEORIGIN 등의 값을 설정
+
+    http.csrf(csrf -> csrf.ignoringRequestMatchers(PathRequest.toH2Console()))
+        .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
+    */
 
 
-    /* RoleController 테스트 하기
-    http.authorizeHttpRequests(  httpReq ->
-        httpReq.requestMatchers("/role/test1").permitAll()
-              .requestMatchers("/role/test2").authenticated()
-              .requestMatchers("/role/test3").hasRole("USER")
-              .requestMatchers("/role/test4").hasRole("ADMIN")
-              .anyRequest().permitAll()
-      );`
-     */
+    //-------------------------------------------------------- //
+    // RoleController 테스트 하기
+    //-------------------------------------------------------- //
+    //    http.authorizeHttpRequests(  httpReq ->
+    //        httpReq.requestMatchers("/role/test1").permitAll()
+    //              .requestMatchers("/role/test2").authenticated()
+    //              .requestMatchers("/role/test3").hasRole("USER")
+    //              .requestMatchers("/role/test4").hasRole("ADMIN")
+    //              .anyRequest().permitAll()
+    //      );
 
+    //-------------------------------------------------------- //
     // 4. 로그아웃 관련 설정
+    //-------------------------------------------------------- //
     // 로그아웃을 기본으로 설정 => url : "/logout" 로그아웃 수행
     //http.logout(Customizer.withDefaults());
+    //-------------------------------------------------------- //
     http.logout(logout -> {
       logout.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
           .logoutSuccessUrl("/")
@@ -153,6 +186,7 @@ public class CustomSecurityConfig {
     http.exceptionHandling(
         e -> e.accessDeniedHandler(accessDeniedHandler())
     );
+
 
 
     return http.build();
@@ -185,6 +219,24 @@ public class CustomSecurityConfig {
                                   .toStaticResources()
                                   .atCommonLocations());
   } // end WebSecurityCustomizer
+
+  // ---------------------------------------------------------------------- //
+  // 3. h2설정 => Spring Security를 통과하지 않도록 하기
+  // ---------------------------------------------------------------------- //
+  /*
+    @ConditionalOnProperty를 통해 스프링 설정에 h2-console이 enable되어 있을때만 작동하도록 설정
+    H2 Console에 대한 요청은 시큐리티 필터를 지나지 않으므로 H2 Console을 자유롭게 이용
+    개발 환경이나 운영 환경에서는 spring.h2.console.enabled를 사용하지 않거나 false로 설정 할 겨우
+    해당 빈이 생성되지 않아 h2에 대한 흔적을 지울 수 있다.
+
+  @Bean
+  @ConditionalOnProperty(name = "spring.h2.console.enabled",havingValue = "true")
+  public WebSecurityCustomizer configureH2ConsoleEnable() {
+    return web -> web.ignoring()
+        .requestMatchers(PathRequest.toH2Console());
+  }
+
+   */
 
 }
 

@@ -63,6 +63,8 @@ dependencies {
 	// thymelef에서 인증 관련 라이브러리
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.2.RELEASE'
 
+	// https://mvnrepository.com/artifact/com.google.code.gson/gson
+	implementation 'com.google.code.gson:gson:2.11.0'
 
 	// spring-boot-devtools
 	//implementation 'org.springframework.boot:spring-boot-devtools:3.3.2'
@@ -74,6 +76,11 @@ dependencies {
 	testImplementation  'org.projectlombok:lombok'
 	// spring-security-test
 	testImplementation 'org.springframework.security:spring-security-test:6.3.1'
+
+	//org.assertj/assertj-core
+	testImplementation 'org.assertj:assertj-core:3.26.3'
+
+
 
 
 

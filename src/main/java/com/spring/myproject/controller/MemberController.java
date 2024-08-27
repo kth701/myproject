@@ -32,8 +32,10 @@ public class MemberController {
     // 포워딩: 뷰리졸브
     return "members/memberForm";
   }
+  // @ModelAttribute: 다양한 소스의 데이터를 모델 특성으로 바인딩하는 데 사용
+  // @RequestBody: HTTP request body를 메소드에 매핑하는데 사용
   @PostMapping(value="/new")
-  public String memberRegister(@Valid @ModelAttribute MemberDTO memberDTO,
+  public String memberRegister(@Valid @ModelAttribute  MemberDTO memberDTO,
                                BindingResult bindingResult,
                                Model model){
 
