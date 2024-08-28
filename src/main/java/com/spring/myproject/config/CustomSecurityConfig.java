@@ -127,7 +127,7 @@ public class CustomSecurityConfig {
 
     http.authorizeHttpRequests( auth -> {
         // 사용자 인증없이 접근할 수 있도록 설정
-        auth.requestMatchers("/","/members/**","/swagger-ui/**", "/test/**").permitAll();
+        auth.requestMatchers("/","/members/**","/swagger-ui/**", "/test/**","/api/**").permitAll();
 
         // ---------------------------------------------------- //
         // 1. h2설정 => h2-console 관련 URL에 대해 인증을 면제

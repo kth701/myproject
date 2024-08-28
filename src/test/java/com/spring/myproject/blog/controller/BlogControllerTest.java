@@ -3,6 +3,7 @@ package com.spring.myproject.blog.controller;
 import com.google.gson.Gson;
 import com.spring.myproject.blog.domain.Article;
 import com.spring.myproject.blog.dto.AddArticleRequest;
+import com.spring.myproject.blog.dto.UpdateArticleRequest;
 import com.spring.myproject.blog.repository.BlogRepository;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.BeforeEach;
@@ -106,4 +107,93 @@ class BlogControllerTest {
         .andExpect(jsonPath("$[0].title").value(title));
 
   }
+
+  @DisplayName("findArticle: 블로그 글 조회 테스트")
+  @Test
+  public void findArticle() throws Exception{
+    // given
+    final String url = "/api/articles/{id}";
+    final String title = "title";
+    final String content = "content";
+
+    // 테스트용 entity 생성하여 db에 저장
+    Article savedArticle = blogRepository.save(
+        Article.builder()
+            .title(title)
+            .content(content)
+        .build());
+
+    // when
+    final ResultActions resultActions = mockMvc.perform(
+        MockMvcRequestBuilders.get(url, savedArticle.getId()));
+    // then
+    resultActions.andExpect(status().isOk())
+        .andExpect(jsonPath("$.content").value(content))
+        .andExpect(jsonPath("$.title").value(title)).andDo(print());
+  }
+
+  @DisplayName("deleteArticle: 블로그 글 삭제 테스트")
+  @Test
+  public void deleteArticle() throws Exception{
+    // given
+    final String url ="/api/articles/{id}";
+    final String title = "title";
+    final String content = "content";
+
+    // 테스트용 entity 생성하여 db에 저장
+    Article savedArticle = blogRepository.save(
+        Article.builder()
+            .title(title)
+            .content(content)
+            .build());
+
+    log.info("\n=> delete Article: "+savedArticle);
+    // when
+    mockMvc.perform(  MockMvcRequestBuilders.delete(url, savedArticle.getId())  )
+          .andExpect(status().isOk())
+          .andDo(print());
+    // then
+    List<Article> articles = blogRepository.findAll();
+
+    assertThat(articles).isEmpty();
+  }
+
+  @DisplayName("updateArticle: 블로그 글 수정 테스트")
+  @Test
+  public void updateArticle() throws Exception{
+     // given
+    final String url ="/api/articles/{id}";
+    final String title = "title";
+    final String content = "content";
+
+    // 테스트용 entity 생성하여 db에 저장
+    Article savedArticle = blogRepository.save(
+        Article.builder()
+            .title(title)
+            .content(content)
+            .build());
+
+    final String newTitle = "new Title";
+    final String newContent = "new Content";
+
+    UpdateArticleRequest request = new UpdateArticleRequest(newTitle, newContent);
+    String updateData = gson.toJson(request);
+
+    // when
+    ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put(url, savedArticle.getId())
+            .accept(MediaType.APPLICATION_JSON)
+            .content(updateData)
+            .contentType(MediaType.APPLICATION_JSON_VALUE))  ;
+
+    // then
+    resultActions.andExpect(status().isOk()).andDo(print());
+
+    Article article = blogRepository.findById(savedArticle.getId()).get();
+
+
+    assertThat(article.getTitle()).isEqualTo(newTitle);
+    assertThat(article.getContent()).isEqualTo(newContent);
+
+  }
+
 }
