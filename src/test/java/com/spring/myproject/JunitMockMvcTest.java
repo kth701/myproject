@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 // 테스트용 애플리케이션 컨텍스트 생성
 @SpringBootTest
 @Log4j2
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc // 테스트용 MVC환경에서 요청 및 전송,응답 기능을 제공, 컨트롤러 테스트 할 때 사용
 //@ExtendWith(MockitoExtension.class)
 @TestPropertySource(locations = {"classpath:application-test.properties"})
 public class JunitMockMvcTest {
@@ -78,6 +78,17 @@ public class JunitMockMvcTest {
     String content = gson.toJson(memberDTO);
     log.info("\n=> gson:"+content);
 
+
+    /*
+    perform(MockMvcRequestBuilders.post(url설정)): 요청을 전송하는 역할
+    MockMvcRequestBuilder.accept(): 요청을 보낼 데이터 타입=> JSON, XML등 타입
+    andExpect(): 응답을 검증 => OK(200)코드 반환(응답) => isOK통행 확인
+    jsonPath("$.필드(속성)이름) : JSON응답값의 값을 가져오는 역할
+    ex) memberDTO 객체 형식 JSON객체 응답 => $.속성
+        List<MemberDTO> memberList => JSON객체 응답 => $[인덱스번호].속성
+        Board객체내에 다른객체를 포함 =>  $.상위객체.하위객체.속성
+
+     */
     // @ModelAttribute: 다양한 소스의 데이터를 모델 특성으로 바인딩하는 데 사용
     // @RequestBody: HTTP request body를 메소드에 매핑하는데 사용(json,xml형식)
     // when
