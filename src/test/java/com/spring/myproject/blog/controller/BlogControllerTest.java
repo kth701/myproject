@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Log4j2
 @AutoConfigureMockMvc // 테스트용 MVC환경에서 요청 및 전송,응답 기능을 제공, 컨트롤러 테스트 할 때 사용
-@TestPropertySource(locations = {"classpath:application-test.properties"})
+//@TestPropertySource(locations = {"classpath:application-test.properties"})
 class BlogControllerTest {
   @Autowired
   protected MockMvc mockMvc;

@@ -239,13 +239,13 @@ public class JunitMockMvcTest {
   // 테스트 케이스 실행 후 실행하는 메서드
   @AfterEach
   public void cleanUp(){
-    memberRepository.deleteAll();
+//    memberRepository.deleteAll();
   }
 
 
   @BeforeEach
   public void beforeCleanUp() {
-    memberRepository.deleteAll();
+//    memberRepository.deleteAll();
   }
 
 }

@@ -58,4 +58,5 @@ public class BlogController {
     Article updateArticle = blogService.update(id, request);
     return ResponseEntity.ok().body(updateArticle);
   }
+
 }

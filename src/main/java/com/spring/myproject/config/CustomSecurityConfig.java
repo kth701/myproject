@@ -126,23 +126,25 @@ public class CustomSecurityConfig {
     //-------------------------------------------------------- //
 
     http.authorizeHttpRequests( auth -> {
-        // 사용자 인증없이 접근할 수 있도록 설정
-        auth.requestMatchers("/","/members/**","/swagger-ui/**", "/test/**","/api/**").permitAll();
+              // 사용자 인증없이 접근할 수 있도록 설정
+              auth.requestMatchers("/","/members/**","/swagger-ui/**", "/test/**","/api/**").permitAll();
 
-        // ---------------------------------------------------- //
-        // 1. h2설정 => h2-console 관련 URL에 대해 인증을 면제
-        // ---------------------------------------------------- //
-        //auth.requestMatchers(PathRequest.toH2Console()).permitAll();
+              // ---------------------------------------------------- //
+              // 1. h2설정 => h2-console 관련 URL에 대해 인증을 면제`
+              // ---------------------------------------------------- //
+              //auth.requestMatchers(PathRequest.toH2Console()).permitAll();
 
-        // USER Role일 경우에만 접근
-        auth.requestMatchers("/board/**").hasRole("USER");
-        // ADMIN Role일 경우에만 접근
-        auth.requestMatchers("/admin/**").hasRole("ADMIN");
 
-        // 설정해준 경로를 제외한 나머지 경로들은 모두 인증을 요구하도록 설정
-        auth.anyRequest().authenticated();
-        //auth.anyRequest().permitAll();
-    });
+              // USER Role일 경우에만 접근
+              auth.requestMatchers("/board/**" ).hasRole("USER");
+              // ADMIN Role일 경우에만 접근
+              auth.requestMatchers("/admin/**" ).hasRole("ADMIN");
+
+              // 설정해준 경로를 제외한 나머지 경로들은 모두 인증을 요구하도록 설정
+              auth.anyRequest().authenticated();
+              //auth.anyRequest().permitAll();
+
+          });
 
     // ---------------------------------------------------------------------- //
     // 2. h2설정 => H2 웹콘솔의 iframe이 정상적으로 작동하려면 Origin에 대해 허용하도록 설정
@@ -156,7 +158,7 @@ public class CustomSecurityConfig {
 
     http.csrf(csrf -> csrf.ignoringRequestMatchers(PathRequest.toH2Console()))
         .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
-    */
+  */
 
 
     //-------------------------------------------------------- //
@@ -236,7 +238,7 @@ public class CustomSecurityConfig {
         .requestMatchers(PathRequest.toH2Console());
   }
 
-   */
+  */
 
 }
 

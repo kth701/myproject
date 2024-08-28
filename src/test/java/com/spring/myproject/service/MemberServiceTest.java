@@ -19,7 +19,8 @@ import java.util.stream.IntStream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@Transactional@Commit
+@Transactional(readOnly = false)
+@Commit
 //@TestPropertySource(locations = {"classpath:application-test.properties"})
 @Log4j2
 class MemberServiceTest {
